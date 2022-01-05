@@ -7,7 +7,7 @@ with open('./regression_data.csv',newline='') as csvfile:
 	for row in spamreader: 
 		out.append(row)
 out = np.asmatrix(out)
-out = out[1:]
-out = out[:,1:]
-out = np.array(out,dtype=float)
-np.save('./regression_data',out)
+out =np.array(out[1:],dtype=float)
+y = out[:,1]
+X = out[:,2:]
+np.savez('./regression_data.npz',y=y,X=X)
