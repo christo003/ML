@@ -1,0 +1,38 @@
+\documentclass{article}
+ \usepackage{graphicx} 
+ \usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{calrsfs}
+\usepackage[T1]{fontenc}
+\date{}
+ \usepackage[colorlinks,urlcolor=blue]{hyperref} 
+  \usepackage[left=1.2in,right=1in,top=1in,bottom=.8in]{geometry}
+ \date{}
+ \title{Devoir personnel}
+\begin{document}
+\maketitle
+\section{}%Ex1
+
+\begin{equation}
+\begin{aligned}
+\bar{e}^2 &= \|\sum_i (v_i-u_i)\phi_i\|_{L^2(\Omega)}^2\\
+&= \sum_i(v_i-u_i)^2 \int_{\Omega}|\phi_i|\\
+&= \sum_i (v_i - u_i )^2 (\text{diag}(M))_i
+\end{aligned}
+\end{equation}
+
+\newpage
+
+\begin{figure}
+
+\includegraphics[scale=0.3]{grad.eps}
+\includegraphics[scale=0.3]{error.eps}
+
+L’erreur correspond bien à l’erreur théorique. 
+Ce qui me semble étrange, car je n’ai pas pris en compte les conditions de bords lors de mon implémentation.
+\end{figure}
+
+
+
+\end{document}
+
