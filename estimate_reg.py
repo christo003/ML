@@ -13,7 +13,7 @@ I=np.arange(num_data)
 np.random.shuffle(I)
 
 nx,ny=4,4
-num_lasso_path = 100
+num_lasso_path = 10000
 
 num_folder = nx*ny
 num_val=int(num_data/num_folder)
@@ -21,6 +21,7 @@ fig,axs = plt.subplots(nx,ny)
 nxM=nx
 out,nx=[],0
 for k in range(num_folder):
+	print(k)
 	X_val = X[I[k*num_val:(k+1)*num_val]]
 	y_val = y[I[k*num_val:(k+1)*num_val]]
 	x_val_m = np.mean(X_val,1)
@@ -58,8 +59,6 @@ for k in range(num_folder):
 med = np.median(np.array(out))
 mea = np.mean(np.array(out))
 alpha = A[np.argmin(np.abs(out-med))]
-idx_no_zero = np.arange(num_feature)[alpha!=0]
-residual = np.sqrt((y- np.dot(X,alpha))**2)
 for i in range(nxM):
 	for j in range(ny):
 		axs[i,j].plot(med,0,'bo',label='median')
@@ -69,8 +68,10 @@ fig.suptitle('CV : estimation regularizateur',fontsize=12)
 plt.legend()
 plt.savefig('cv_reg.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
+X_center=(X-np.mean(X,1).reshape((num_data,1)))/np.std(X,1).reshape((num_data,1))
 reg=med
-np.savez('./regression_data2.npz',X=X.T[idx_no_zero].T,y=residual)
-#détails ptre sauvegarder que lambda et alpha pour recaluler alpha avec tout le jeu de données (pas de grand changement observable)
-
+alpha,_,_,_ = lasso(X_center,y,alpha,reg)
+residual = y- (np.dot(X_center,alpha)*np.std(X,1)+np.mean(X,1))
+idx_no_zero = np.arange(num_feature)[alpha!=0]
+np.savez('./regression_data2.npz',X=X.T[idx_no_zero].T,y=residual,alpha=alpha,reg=reg)
 print('features which lasso doesnt put to 0',idx_no_zero)
