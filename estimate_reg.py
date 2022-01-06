@@ -37,8 +37,8 @@ for k in range(num_folder):
 		X_train = np.concatenate((XA,XB))
 		y_train = np.concatenate((yA,yB))
 
-
-	A,L,TOL,NUM_ITER,TIME = warm_start(X_train,y_train,num_lasso_path)
+	nval = X_train.shape[0]
+	A,L,TOL,NUM_ITER,TIME = warm_start((X_train-np.mean(X_train,1).reshape((nval,1)))/np.std(X_train,1).reshape((nval,1)),y_train,num_lasso_path)
 	idx,mse = 0,sys.maxsize
 	for i in range(num_lasso_path):
 		current = np.mean((y_val-(x_val_std*np.dot(X_val,A[i])+x_val_m))**2)
@@ -71,3 +71,6 @@ plt.savefig('cv_reg.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
 reg=med
 np.savez('./regression_data2.npz',X=X.T[idx_no_zero].T,y=residual)
+#détails ptre sauvegarder que lambda et alpha pour recaluler alpha avec tout le jeu de données (pas de grand changement observable)
+
+print('features which lasso doesnt put to 0',idx_no_zero)
