@@ -10,4 +10,4 @@ out = np.asmatrix(out)
 out =np.array(out[1:],dtype=float)
 y = out[:,1]
 X = out[:,2:]
-np.savez('./regression_data.npz',y=y,X=X)
+np.savez('./regression_data1.npz',y=y,X=X)
