@@ -29,6 +29,7 @@ fig, ax_array = plt.subplots(rows, columns,squeeze=False)
 k=0
 for i,ax_row in enumerate(ax_array):
 	for j,axes in enumerate(ax_row):
+		
 		axes.set_title(str(k).format(i,j))
 		axes.set_yticklabels([])
 		axes.set_xticklabels([])
