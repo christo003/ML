@@ -50,11 +50,21 @@ def lasso(X,y,a,l):
     #print('      num iter is : ',k)
     #print('      Time: ', stop - start)  
     return a,tol,k,stop - start
-def warm_start(X,y,num_lasso_path):
+def warm_start(X,y,num_lasso_path,is_to_plot=True,m=0,std=1):
 	X=((X.T-np.mean(X,1))/np.std(X,1)).T
 	k=0
 	lmax=np.max(np.dot(X.T,y))
-	L=np.linspace(lmax,0,num_lasso_path)
+	if is_to_plot:
+		L=np.linspace(lmax,0,num_lasso_path)
+		
+	else:
+		L=np.unique(np.random.normal(m,std,num_lasso_path))
+		L=(L-np.min(L))	
+		L=L*lmax/np.max(L)
+		#L=np.unique(np.append(0,np.random.uniform(0,lmax,num_lasso_path-1)))
+		while L.shape[0]!=num_lasso_path:
+			L=np.unique(np.concatenate(L,np.random.normal(m,std,num_lasso_path-L.shape[0])))
+		L=np.sort(L)
 	A=np.zeros((num_lasso_path+1,X.shape[1]))
 	size_l=L.shape[0]
 	L[0]=lmax-0.1

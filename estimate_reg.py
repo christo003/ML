@@ -9,26 +9,24 @@ data=np.load('regression_data1.npz')
 y,X= data['y'],data['X']
 num_data,num_feature=X.shape
 
-num_cv  = 15
+num_cv  =5 
 I_all=np.array([np.arange(num_data) for i in range(num_cv)])
 for i in range(num_cv):
 	np.random.shuffle(I_all[i])
 
 
-rows,columns=3,3
-num_lasso_path = 1000
+rows,columns=2,2
+num_lasso_path =10
 
 num_folder =rows*columns 
 num_val=int(num_data/num_folder)
-L_all = []
-A_all = []
-out_all = []
-MSE_cross = []
-idx_all = []
+
+L_all,A_all,out_all,MSE_cross,idx_all,no_zero_feature_all = [],[],[],[],[],[]
+
 for j in range(num_cv):
 	print('num_cv : ',j+1, '/ ' , num_cv)
 	I = I_all[j]
-	out,mse_cross,L,A,idx_list=[],[],[],[],[]
+	out,mse_cross,L,A,idx_list,m,std,no_zero_feature=[],[],[],[],[],0,1,[]
 	for k in range(num_folder):
 		print('\t num_folder : ',k+1, ' / ', num_folder)
 		X_val = X[I[k*num_val:(k+1)*num_val]]
@@ -38,32 +36,36 @@ for j in range(num_cv):
 
 		#cross validation statement
 		if k==0:
-			X_train,y_train = X[I[(k+1)*num_val+1:]],y[I[(k+1)*num_val+1:]]
+			X_train,y_train = X[I[(k+1)*num_val:]],y[I[(k+1)*num_val:]]
 		elif k == num_folder:
-			X_train,y_train=X[I[0:k*num_val-1]],y[I[0:k*num_val-1]]
+			X_train,y_train=X[I[0:(k-1)*num_val]],y[I[0:(k-1)*num_val]]
 		else: 
-			XA,yA,XB,yB = X[I[0:(k-1)*num_val]],y[I[0:(k-1)*num_val]],X[I[(k+1)*num_val+1:]],y[I[(k+1)*num_val+1:]]
+			XA,yA,XB,yB = X[I[0:(k-1)*num_val]],y[I[0:(k-1)*num_val]],X[I[(k+1)*num_val:]],y[I[(k+1)*num_val:]]
 			X_train,y_train = np.concatenate((XA,XB)),np.concatenate((yA,yB))
 
 		nval = X_train.shape[0]
 		m_train,std_train  = np.mean(X_train,0).reshape((1,num_feature)),np.std(X_train,0).reshape((1,num_feature))
-		tA,tL,_,_,_ = warm_start((X_train-m_train)/std_train,y_train,num_lasso_path)
+		tA,tL,_,_,_ = warm_start((X_train-m_train)/std_train,y_train,num_lasso_path,True,m,std)
 		idx,mse = 0,sys.maxsize
 		for i in range(num_lasso_path):
 			current = np.mean((y_val-np.dot((X_val-m_train)/std_train,tA[i]))**2)
 			if (current < mse) :
 				idx,mse = i,current
 		mse_cross.append(mse)
-		idx_list.append(idx),out.append(tL[idx]),L.append(tL),A.append(tA)
-	out_all.append(out),idx_all.append(idx_list),L_all.append(L),A_all.append(A),MSE_cross.append(mse_cross)
+		idx_list.append(idx),out.append(tL[idx]),L.append(tL),A.append(tA),no_zero_feature.append(tA[idx])
+	#print(out)
+	out_all.append(out),idx_all.append(idx_list),L_all.append(L),A_all.append(A),MSE_cross.append(mse_cross),no_zero_feature_all.append(no_zero_feature)
 
 ##########
-
-best_cv = np.argmin(np.mean(MSE_cross,1))
-idx,A,L,out = idx_all[best_cv],np.array(A_all[best_cv]),np.array(L_all[best_cv]),np.array(out_all[best_cv])
-med,mea = np.median(np.array(out)),np.mean(np.array(out))
-
-
+best_cv = np.argmin(np.median(MSE_cross,1))
+idx,A,L,out,no_zero_feature = idx_all[best_cv],np.array(A_all[best_cv]),np.array(L_all[best_cv]),np.array(np.median(out_all,1)),np.array(no_zero_feature_all)
+best_reg_idx = np.argmin(np.abs(np.array(out_all)-out.reshape((out.shape[0],1))),1)
+med,mea = np.median(out),np.mean((out))
+no_zero_feature= np.array([no_zero_feature[i,best_reg_idx[i],:] for i in range(no_zero_feature.shape[0])])
+feature_select = np.zeros(no_zero_feature.shape)
+feature_select[no_zero_feature!=0]=1
+feature_select = np.mean(feature_select,0)
+print(feature_select)
 k=0
 fig, ax_array = plt.subplots(rows, columns,squeeze=False)
 
@@ -74,7 +76,7 @@ for i,ax_row in enumerate(ax_array):
 		axes.plot(out[k],0,'ro',label='best on this folder')
 		axes.plot(med,0,'bo',label='median')
 		axes.plot(mea,0,'go',label='mean')
-		axes.set_xlim(0,4000)
+		axes.set_xlim(0,2500)
 		axes.set_ylim(-1,1)
 		k=k+1
 
@@ -94,7 +96,7 @@ plt.savefig('mse_cv.png',format='png',dpi=300,bbox_inches='tight')
 plt.show()
  
 plt.figure()
-plt.plot(best_cv,med,'go',label='reg')
+plt.plot(best_cv,mea,'go',label='reg')
 plt.plot(np.mean(out_all,1),'r',label='reg_cv')
 plt.plot(np.mean(out_all,1)-(np.std(out_all,1)),'r-.',label ='reg_std_cv')
 plt.plot(np.mean(out_all,1)+(np.std(out_all,1)),'r-.')
@@ -106,11 +108,11 @@ plt.show()
 alpha = A[np.argmin(np.abs(out-med)),idx[np.argmin(np.abs(out-med))],:]
 m_train,std_train=np.mean(X,0).reshape((1,num_feature)),np.std(X,0).reshape((1,num_feature))
 X_normalise=(X-m_train)/std_train
-alpha,_,_,_ = lasso(X_normalise,y,alpha,med)
+alpha,_,_,_ = lasso(X_normalise,y,alpha,mea)
 residual = y- np.dot(X_normalise,alpha)
 idx_no_zero = np.arange(num_feature)[alpha!=0]
 np.savez('./regression_data2.npz',X=X.T[idx_no_zero].T,y=residual)
-np.savez('./model_lasso.npz',alpha=alpha, reg=med, X_train_normalise = X_normalise,y_train = y , mean_train= m_train, std_train=std_train)
+np.savez('./model_lasso.npz',alpha=alpha, reg=mea, X_train_normalise = X_normalise,y_train = y , mean_train= m_train, std_train=std_train)
 print('features which lasso doesnt put to 0',idx_no_zero)
-print('reg ' ,med )
+print('reg ' ,mea )
 
