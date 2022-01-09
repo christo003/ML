@@ -10,14 +10,13 @@ y,X= data['y'],data['X']
 num_data,num_feature=X.shape
 
 num_cv  = 10
-p=1
 I_all=np.array([np.arange(num_data) for i in range(num_cv)])
 for i in range(num_cv):
 	np.random.shuffle(I_all[i])
 
 
 rows,columns=10,10
-num_lasso_path =1000
+num_lasso_path =3000
 
 num_folder =rows*columns 
 num_val=int(num_data/num_folder)
@@ -63,19 +62,13 @@ for j in range(num_cv):
 ## pour trouver le meilleure cross validation, on regarde celui qui selectionne au mieux les features
 out_all,idx_all,L_all,A_all,MSE_cross,feature_all, = np.array(out_all),np.array(idx_all),np.array(L_all),np.array(A_all),np.array(MSE_cross),np.array(feature_all)
 
-feature_no_zero=np.zeros(feature_all.shape)
-feature_no_zero[feature_all!=0]=1
-feature_prior= np.mean(np.abs(feature_no_zero),(0,1))
-print('prior feature:\n',feature_prior)
-feature_prior[feature_prior<p]=0
-feature_select=np.zeros(num_feature)
-feature_select[feature_prior>=p]=1
-print('feature selected with prob ',p,' :\n',feature_select)
-dist_feature = np.mean(feature_no_zero==feature_select,2)
+feature_select= np.median(feature_all,(0,1))
+print('median feature:\n',feature_select)
+dist_feature = np.mean((feature_all-feature_select)**2,2)
 arr = np.mean(dist_feature,1)
 best_cv = np.where(arr == arr.max())[0]
 if len(best_cv)==1:
-	arr= np.mean(feature_no_zero[best_cv[0]]==feature_select,1)
+	arr= np.mean(feature_all[best_cv[0]]==feature_select,1)
 	best_cv_plot=best_cv[0]
 else:
 	
@@ -84,10 +77,11 @@ else:
 best_fold = np.where(arr==arr.max())[0]
 list_reg= out_all[best_cv,best_fold]
 print('potential regularizateur: ',list_reg)
+print('best cross validation : ', best_cv)
 reg = np.median(list_reg)
 best_cv = best_cv_plot
-print('best cross validation : ',best_cv)
-print('best folder in this cross val : ', best_fold)
+print('best cross validation (for plot): ',best_cv)
+print('best folder in this cross val (all cv) : ', best_fold)
 idx,A,L,out = idx_all[best_cv],np.array(A_all[best_cv]),np.array(L_all[best_cv]),out_all[best_cv]
 med,mea = np.median(out),np.mean((out))
 k=0
@@ -101,7 +95,7 @@ for i,ax_row in enumerate(ax_array):
 		axes.plot(med,0,'bo',label='median')
 		axes.plot(mea,0,'go',label='mean')
 		axes.plot(reg,0,'ko',label='reg')
-		axes.set_xlim(0,2500)
+		axes.set_xlim(0,3000)
 		axes.set_ylim(-1,1)
 		k=k+1
 
@@ -140,7 +134,7 @@ alpha,_,_,_ = lasso(X_normalise,y,alpha,reg)
 residual = y- np.dot(X_normalise,alpha)
 idx_no_zero = np.arange(num_feature)[alpha!=0]
 np.savez('./regression_data2.npz',X=X.T[idx_no_zero].T,y=residual)
-np.savez('./model_lasso.npz',alpha=alpha, reg=reg, X_train_normalise = X_normalise,y_train = y , mean_train= m_train, std_train=std_train)
+np.savez('./model_lasso.npz',alpha=alpha, reg=reg, X = X_normalise,y= y , mean= m_train, std=std_train)
 print('features which lasso doesnt put to 0',idx_no_zero)
 print('reg ' ,reg )
 
