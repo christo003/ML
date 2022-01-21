@@ -55,6 +55,7 @@ for j in range(num_cv):
 		idx_list.append(idx),out.append(tL[idx]),L.append(tL),A.append(tA),feature.append(tA[idx])
 	#print(out)
 	out_all.append(out),idx_all.append(idx_list),L_all.append(L),A_all.append(A),MSE_cross.append(mse_cross),feature_all.append(feature)
+	
 
 ##########
 

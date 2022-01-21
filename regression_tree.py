@@ -77,7 +77,7 @@ def regression_tree_bis(train,target,num_leaf):
 	I=np.arange(num_feature)
 	np.random.shuffle(I)
 	#for k in  I :
-	for i in range(np.random.randint(0,int(num_data/3),1)[0],np.random.randint(num_data-int(num_data/3),num_data,1)[0],num_leaf):
+	for i in range(np.random.randint(0,int(num_data/3),1)[0]+int(num_data/6),np.random.randint(num_data-int(num_data/3),num_data,1)[0]-int(num_data/6),num_leaf):
 		#idx=np.argsort(train[:,k])
 		#x,y = train[idx],target[idx]
 		#for i in range(1,num_data-1,num_leaf):
