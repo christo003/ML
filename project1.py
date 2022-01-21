@@ -12,7 +12,7 @@ num_data,num_feature=X.shape
 
 
 num_lasso =5
-num_cv=10
+num_cv=5
 
 num_fold=int(num_data/num_cv)
 
@@ -25,24 +25,30 @@ for i in range(num_cv):
 
 
 
-out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_split,out_min_samples_leaf,out_bootstrap, out_ccp_alphas = [],[],[],[],[],[],[],[]
+out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_split,out_min_samples_leaf,out_max_samples, out_ccp_alphas = [],[],[],[],[],[],[],[]
 
-n_estimators=[130,140]
-max_features = ['sqrt']#,'auto','log2']
-max_depth=[2]#,4]
+
+n_estimators=[130]
+max_features = ['log2','sqrt']
+max_depth=[2,3]
 #max_depth.append(None)
-min_samples_split = [5]#,6]
-min_samples_leaf = [2]#,3]
-bootstrap = [True]
-ccp_alphas = [0]
-random_grid = {'n_estimators':n_estimators,'max_features':max_features,'max_depth':max_depth,'min_samples_split':min_samples_split,'min_samples_leaf' : min_samples_leaf,'bootstrap':bootstrap}
+min_samples_split = [6,15]
+min_samples_leaf = [5,7]
+max_samples = [1]
+ccp_alphas= [0]#[10,100,1000,2000]
+REG=np.linspace(1650,1700,num_lasso)
+
+
+
+
+
 defaut_train,default_val=[],[]
 out_lambda=[]
 best=[]
 rfs,val_acc,train_acc = [],[],[] 
 out_ridge_train,out_ridge_val,out_alpha_ridge = [],[],[]
 out_train_RERFs,out_val_RERFs=[],[]
-REG=np.linspace(1670,1682,num_lasso)
+
 parameters=[]
 for j in range(num_cv):
 	best_score=-sys.maxsize
@@ -133,11 +139,11 @@ for j in range(num_cv):
 						#print('\t\t    min_samples_split ',min_sample_split, ' / ',min_samples_split )
 						for min_sample_leaf in min_samples_leaf:
 							#print('\t\t     min_sample_leaf ',min_sample_leaf, ' / ',min_samples_leaf )
-							for boot in bootstrap:
+							for max_sample in max_samples:
 								#print('\t\t      bootstrap ',boot, ' / ',bootstrap )
 								for ccp_alpha in ccp_alphas:
 									#print('\t\t       ccp_alpha ',ccp_alpha, ' / ',ccp_alphas)
-									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=boot)
+									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,criterion = 'absolute_error',max_samples=max_sample)
 									rf.fit(train_forest,train_target_forest)
 									score=rf.score(val_forest,val_target_forest)
 									if score>best_forest_score:
@@ -157,46 +163,24 @@ for j in range(num_cv):
 										u = ((train_target_forest-y_pred)**2).sum()
 										v = ((train_target_forest-train_target_forest.mean())**2).sum()
 										best_RERFs_train_acc = 1-u/v
-										best_model = [alpha_forest,rf.get_params(deep=True),idx_no_zero,m_train,std_train,m_forest,std_forest,reg]
+										best_model = [alpha_forest,rf.get_params(deep=True),idx_no_zero,m_train,std_train,m_forest,std_forest,reg,rf]
 
 		rf = RandomForestRegressor()
 		rf.fit(train_forest,train_target_forest)
 		default_val.append(rf.score(val_forest,val_target_forest))
 		defaut_train.append(rf.score(train_forest,train_target_forest))
-	alpha,rf,idx_no_zero,m_train,std_train,m_forest,std_forest,reg=best_model
+	alpha,param,idx_no_zero,m_train,std_train,m_forest,std_forest,reg,rf=best_model
 	rfs.append(best_model)
 	val_acc.append(best_score)
 	train_acc.append(best_RERFs_train_acc)
-	param = rf
 	parameters.append(param)
 	out_n_estimators.append(param['n_estimators'])
 	out_max_features.append(param['max_features'])
-	tot_depth=0
-	#for rt in rf.estimators_:
-	#	tree = rt.tree_
-	#	n_nodes = tree.node_count
-	#	children_left = tree.children_left
-	#	children_right = tree.children_right
-	#	node_depth = np.zeros(n_nodes,dtype=np.int64)
-	#	is_leaves = np.zeros(n_nodes,dtype=bool)
-	#	stack = [(0,0)]
-	#	while len(stack)>0:
-	#		node_id,depth = stack.pop()
-	#		node_depth[node_id]=depth	
-	#		is_split_node = children_left[node_id]!=children_right[node_id]
-	#		if is_split_node:
-	#			stack.append((children_left[node_id],depth+1))
-	#			stack.append((children_right[node_id],depth+1))
-	#		else:
-	#			is_leaves[node_id] = True
-	#	tot_depth=tot_depth+depth
-	#tot_depth /=len(rf.estimators_)
-	#out_max_depth.append(tot_depth)
 	out_min_samples_split.append(param['min_samples_split'])
 	out_min_samples_leaf.append(param['min_samples_leaf'])
-	out_bootstrap.append(param['bootstrap'])
+	out_max_samples.append(param['max_samples'])
+	out_max_depth.append(param['max_depth'])
 	out_ccp_alphas.append(param['ccp_alpha'])
-	best.append(rf)
 	out_lambda.append(reg)
 	y_pred = np.dot(X_val[:,idx_no_zero],alpha)+rf.predict((X_val[:,idx_no_zero]-m_forest)/std_forest)
 	u=((y_val-y_pred)**2).sum()
@@ -213,18 +197,15 @@ print('out_alpha_ridge',out_alpha_ridge)
 print('out_ridge_train',out_ridge_train)
 
 print('out_lambda',out_lambda)
-#print('defaut train accu' ,defaut_train)
-#print('defaut val accu'  ,default_val)
-#print('train_acc',train_acc)
-#print('val_acc',val_acc)
 print()
 print('out_n_estimators',out_n_estimators)
 print('out_max_features',out_max_features)
-#print('out_max_depth',out_max_depth)
 print('out_min_samples_split',out_min_samples_split)
 print('out_min_samples_leaf',out_min_samples_leaf)
-#print('out_bootstrap',out_bootstrap)
-#print('out_ccp_alpha',out_ccp_alphas)
+print('out_max_samples',out_max_samples)
+print('out_ccp_alpha',out_ccp_alphas)
+print('out_max_deapth',out_max_depth)
+
 
 print()
 print('reg ridge',np.median(out_alpha_ridge))
@@ -247,7 +228,7 @@ if (auto<=sqrt)&(sqrt>=log2):
 	t=', max_features = sqrt'
 if (auto<=log2)&(sqrt<=log2):
 	t=', max_features = log2'
-print('n_estimator=',np.median(out_n_estimators),t,', max_depth = ',np.median(out_max_depth),', min_samples_split = ',np.median(out_min_samples_split),', min_samples_leaf = ',np.median(out_min_samples_leaf))
+print('n_estimator=',np.median(out_n_estimators),t,', max_depth = ',np.median(out_max_depth),', min_samples_split = ',np.median(out_min_samples_split),', min_samples_leaf = ',np.median(out_min_samples_leaf),', max_samples = ',np.median(out_max_samples),', ccp_alpha = ',np.median(out_ccp_alphas))
 print()
 
 
@@ -266,6 +247,6 @@ print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
 idx = np.argmin(np.abs(out_val_RERFs-np.median(out_val_RERFs)))
 
-alpha,rf,idx_no_zero,m_train,std_train,m_forest,std_forest,reg=rfs[idx]
-np.savez('parameters.npz',model_lasso=alpha,model_forest = rf,idx_no_zero = idx_no_zero,m_lasso=m_train,std_lasso=std_train,m_forest=m_forest,std_forest=std_forest,reg_lasso=reg)
+alpha,param,idx_no_zero,m_train,std_train,m_forest,std_forest,reg,_=rfs[idx]
+np.savez('parameters.npz',model_lasso=alpha,param_forest = param,idx_no_zero = idx_no_zero,m_lasso=m_train,std_lasso=std_train,m_forest=m_forest,std_forest=std_forest,reg_lasso=reg)
 
