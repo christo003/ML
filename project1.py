@@ -30,13 +30,13 @@ out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_sp
 
 n_estimators=[130,140]
 max_features = ['log2','sqrt']
-max_depth=[2,3,5,20]
+max_depth=[2,3,4,5]
 #max_depth.append(None)
-min_samples_split = [2,4,6,9]
+min_samples_split = [4,6,9,20]
 min_samples_leaf = [2,5,6,8]
 max_samples = [1]
 min_impurity_decrease= [0]#,1000]#[10,100,1000,2000]
-REG=np.linspace(1625,2010,num_lasso)
+REG=np.linspace(1650,3000,num_lasso)
 
 
 
