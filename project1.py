@@ -11,8 +11,8 @@ y,X= data['y'],data['X']
 num_data,num_feature=X.shape
 
 
-num_lasso =5
-num_cv=5
+num_lasso =100
+num_cv=10
 
 num_fold=int(num_data/num_cv)
 
@@ -25,18 +25,18 @@ for i in range(num_cv):
 
 
 
-out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_split,out_min_samples_leaf,out_max_samples, out_ccp_alphas = [],[],[],[],[],[],[],[]
+out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_split,out_min_samples_leaf,out_max_samples, out_min_impurity_decrease = [],[],[],[],[],[],[],[]
 
 
-n_estimators=[130]
+n_estimators=[130,140]
 max_features = ['log2','sqrt']
-max_depth=[2,3]
+max_depth=[2,3,5,20]
 #max_depth.append(None)
-min_samples_split = [6,15]
-min_samples_leaf = [5,7]
+min_samples_split = [2,4,6,9]
+min_samples_leaf = [2,5,6,8]
 max_samples = [1]
-ccp_alphas= [0]#[10,100,1000,2000]
-REG=np.linspace(1650,1700,num_lasso)
+min_impurity_decrease= [0]#,1000]#[10,100,1000,2000]
+REG=np.linspace(1625,2010,num_lasso)
 
 
 
@@ -141,9 +141,9 @@ for j in range(num_cv):
 							#print('\t\t     min_sample_leaf ',min_sample_leaf, ' / ',min_samples_leaf )
 							for max_sample in max_samples:
 								#print('\t\t      bootstrap ',boot, ' / ',bootstrap )
-								for ccp_alpha in ccp_alphas:
-									#print('\t\t       ccp_alpha ',ccp_alpha, ' / ',ccp_alphas)
-									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,criterion = 'absolute_error',max_samples=max_sample)
+								for min_impurity_decr in min_impurity_decrease:
+									#print('\t\t       min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decrease)
+									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=max_sample)
 									rf.fit(train_forest,train_target_forest)
 									score=rf.score(val_forest,val_target_forest)
 									if score>best_forest_score:
@@ -180,7 +180,7 @@ for j in range(num_cv):
 	out_min_samples_leaf.append(param['min_samples_leaf'])
 	out_max_samples.append(param['max_samples'])
 	out_max_depth.append(param['max_depth'])
-	out_ccp_alphas.append(param['ccp_alpha'])
+	out_min_impurity_decrease.append(param['min_impurity_decrease'])
 	out_lambda.append(reg)
 	y_pred = np.dot(X_val[:,idx_no_zero],alpha)+rf.predict((X_val[:,idx_no_zero]-m_forest)/std_forest)
 	u=((y_val-y_pred)**2).sum()
@@ -203,7 +203,7 @@ print('out_max_features',out_max_features)
 print('out_min_samples_split',out_min_samples_split)
 print('out_min_samples_leaf',out_min_samples_leaf)
 print('out_max_samples',out_max_samples)
-print('out_ccp_alpha',out_ccp_alphas)
+print('out_min_impurity_decr',out_min_impurity_decrease)
 print('out_max_deapth',out_max_depth)
 
 
@@ -228,7 +228,7 @@ if (auto<=sqrt)&(sqrt>=log2):
 	t=', max_features = sqrt'
 if (auto<=log2)&(sqrt<=log2):
 	t=', max_features = log2'
-print('n_estimator=',np.median(out_n_estimators),t,', max_depth = ',np.median(out_max_depth),', min_samples_split = ',np.median(out_min_samples_split),', min_samples_leaf = ',np.median(out_min_samples_leaf),', max_samples = ',np.median(out_max_samples),', ccp_alpha = ',np.median(out_ccp_alphas))
+print('n_estimator=',np.median(out_n_estimators),t,', max_depth = ',np.median(out_max_depth),', min_samples_split = ',np.median(out_min_samples_split),', min_samples_leaf = ',np.median(out_min_samples_leaf),', max_samples = ',np.median(out_max_samples),', min_impurity_decrease = ',np.median(out_min_impurity_decrease))
 print()
 
 

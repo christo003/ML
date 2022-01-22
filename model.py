@@ -28,4 +28,7 @@ X_f = (X_f-m_f)/std_f
 
 rf.fit(X_f,y_f)
 
+print('reg_lasso',reg_lasso)
+print('index no nul',idx_no_zero)
+
 np.savez('model.npz',lasso={'alpha':a,'m':m,'std':std},rf={'rf':rf,'m':m_f,'std':std_f,'idx':idx_no_zero} )
