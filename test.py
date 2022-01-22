@@ -8,42 +8,41 @@ data = np.load('test.npz')
 
 X , y =data['X'],data['y']
 
+num_data,num_feature=X.shape
+
 data = np.load('model.npz',allow_pickle=True)
 
 lasso = data['lasso'].item()
 
 a,m_lasso ,std_lasso = lasso['alpha'],lasso['m'],lasso['std']
 
-X_lasso=(X-m_lasso)/std_lasso
+X=(X-m_lasso)/std_lasso
 
-random_forest = data['rf'].item()
-
-
-
-rf,m_forest,std_forest,idx = random_forest['rf'],random_forest['m'],random_forest['std'],random_forest['idx']
+rf = data['random_forest'].item()['rf']
 
 print(rf.get_params(deep=True))
 
-X_forest=((X_lasso[:,idx]-m_forest)/std_forest)
 
-y_pred = np.dot(X_lasso,a)+rf.predict(X_forest)
+y_pred = np.dot(X,a)+rf.predict(X)
 
 acc = 1-((y-y_pred)**2).sum()/((y-y.mean())**2).sum()
 
-rows,columns = (len(idx)),1
-
-fig,axe_array = plt.subplots(rows,columns,squeeze=False)
-for i,ax_row in enumerate(axe_array):
-	for j,axes in enumerate(ax_row):
-		index = np.argsort(X[:,i])
-		axes.semilogx(X[index,i],y[index],'or',label=' true')
-		axes.semilogx(X[index,i],y_pred[index],'ob',label=' pred')
-
-
-plt.legend()
-plt.show()
 
 print('accuracy : ' , acc)
+plt.figure()
+idx= np.argsort(y)
+plt.plot(y[idx],label='target')
+plt.plot(y_pred[idx],',',label='pred target')
+plt.legend()
+plt.savefig('pred_vs_true.png')
+plt.show()
 
-print(rf.feature_importances_)
-
+plt.figure()
+data = np.load('regression_data1.npz')
+y_ = data['y']
+idx_ = np.argsort(y_)
+plt.plot(y_[idx_],label='initial data')
+plt.plot(y[idx],label='true data')
+plt.legend()
+plt.savefig('initial_value_and_test_value.png')
+plt.show()

@@ -15,14 +15,15 @@ for i in range(num_cv):
 	np.random.shuffle(I_all[i])
 
 
-rows,columns=10,10
-num_lasso_path =3000
+rows,columns=3,3
+num_lasso_path = 50
 
 num_folder =rows*columns 
 num_val=int(num_data/num_folder)
 
 L_all,A_all,out_all,MSE_cross,idx_all,feature_all = [],[],[],[],[],[]
 print('num of point in the lasso path: ',num_lasso_path)
+cv_med = []
 for j in range(num_cv):
 	print('num_cv : ',j+1, '/ ' , num_cv)
 	I = I_all[j]
@@ -53,36 +54,42 @@ for j in range(num_cv):
 				idx,mse = i,current
 		mse_cross.append(mse)
 		idx_list.append(idx),out.append(tL[idx]),L.append(tL),A.append(tA),feature.append(tA[idx])
-	#print(out)
+	cv_med.append(np.argmin(np.abs(mse_cross-np.median(mse_cross))))
 	out_all.append(out),idx_all.append(idx_list),L_all.append(L),A_all.append(A),MSE_cross.append(mse_cross),feature_all.append(feature)
 	
 
 ##########
-
-
+out_all=np.array(out_all)
+#print(out_all.shape)
+#print(cv_med)
+REG=np.array([out_all[k,cv_med[k]] for k in range(len(cv_med))])
+reg = np.mean(REG)
+print('reg' ,reg)
 ## pour trouver le meilleure cross validation, on regarde celui qui selectionne au mieux les features
 out_all,idx_all,L_all,A_all,MSE_cross,feature_all, = np.array(out_all),np.array(idx_all),np.array(L_all),np.array(A_all),np.array(MSE_cross),np.array(feature_all)
 
-feature_select= np.median(feature_all,(0,1))
-print('median feature:\n',feature_select)
-dist_feature = np.mean((feature_all-feature_select)**2,2)
-arr = np.mean(dist_feature,1)
-best_cv = np.where(arr == arr.max())[0]
-if len(best_cv)==1:
-	arr= np.mean(feature_all[best_cv[0]]==feature_select,1)
-	best_cv_plot=best_cv[0]
-else:
+
+#feature_select= np.median(feature_all,(0,1))
+#print('median feature:\n',feature_select)
+#dist_feature = np.mean((feature_all-feature_select)**2,2)
+#arr = np.mean(dist_feature,1)
+#best_cv = np.where(arr == arr.max())[0]
+#if len(best_cv)==1:
+#	arr= np.mean(feature_all[best_cv[0]]==feature_select,1)
+#	best_cv_plot=best_cv[0]
+#else:
 	
-	arr= np.mean(np.mean(feature_no_zero[best_cv]==feature_select,2),1)
-	best_cv_plot = best_cv[np.random.randint(0,len(best_cv),1)]
-best_fold = np.where(arr==arr.max())[0]
-list_reg= out_all[best_cv,best_fold]
-print('potential regularizateur: ',list_reg)
-print('best cross validation : ', best_cv)
-reg = np.median(list_reg)
-best_cv = best_cv_plot
-print('best cross validation (for plot): ',best_cv)
-print('best folder in this cross val (all cv) : ', best_fold)
+#	arr= np.mean(np.mean(feature_no_zero[best_cv]==feature_select,2),1)
+#	best_cv_plot = best_cv[np.random.randint(0,len(best_cv),1)]
+#best_fold = np.where(arr==arr.max())[0]
+#list_reg= out_all[best_cv,best_fold]
+#print('potential regularizateur: ',list_reg)
+#print('best cross validation : ', best_cv)
+#reg = np.median(list_reg)
+#best_cv = best_cv_plot
+#print('best cross validation (for plot): ',best_cv)
+#print('best folder in this cross val (all cv) : ', best_fold)
+best_cv = 0
 idx,A,L,out = idx_all[best_cv],np.array(A_all[best_cv]),np.array(L_all[best_cv]),out_all[best_cv]
 med,mea = np.median(out),np.mean((out))
 k=0
@@ -138,4 +145,7 @@ np.savez('./regression_data2.npz',X=X.T[idx_no_zero].T,y=residual)
 np.savez('./model_lasso.npz',alpha=alpha, reg=reg, X = X_normalise,y= y , mean= m_train, std=std_train)
 print('features which lasso doesnt put to 0',idx_no_zero)
 print('reg ' ,reg )
-
+plt.figure()
+plt.plot(REG)
+plt.savefig('reg_cv_lasso_path',format='png',dpi=300,bbox_inches='tight')
+plt.show()

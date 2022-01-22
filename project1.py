@@ -11,32 +11,24 @@ y,X= data['y'],data['X']
 num_data,num_feature=X.shape
 
 
-num_lasso =100
-num_cv=10
+
+num_cv=5
+nnum_lasso =1
+n_estimators=[100]
+max_features = ['log2']
+num_max_samples=1	
+num_max_depth=1
+num_sample_split=1
+num_min_samples_leaf=1
+#num_min_impurity_decrease=1
 
 num_fold=int(num_data/num_cv)
-
-
 I_all=[np.arange(num_data) for i in range(num_cv)]
-
-
 for i in range(num_cv):
 	np.random.shuffle(I_all[i])
 
 
-
 out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_split,out_min_samples_leaf,out_max_samples, out_min_impurity_decrease = [],[],[],[],[],[],[],[]
-
-
-n_estimators=[130,140]
-max_features = ['log2','sqrt']
-max_depth=[2,3,4,5]
-#max_depth.append(None)
-min_samples_split = [4,6,9,20]
-min_samples_leaf = [2,5,6,8]
-max_samples = [1]
-min_impurity_decrease= [0]#,1000]#[10,100,1000,2000]
-REG=np.linspace(1650,3000,num_lasso)
 
 
 
@@ -51,17 +43,28 @@ out_train_RERFs,out_val_RERFs=[],[]
 
 parameters=[]
 for j in range(num_cv):
+	
+	
+	max_samples = list(np.unique(np.random.uniform(0,1,num_max_samples)))
+	max_samples.append(1)
+	max_depth=np.unique(np.random.randint(2,5,num_max_depth))
+	min_samples_split =np.unique(np.random.randint(6,12,num_sample_split))
+	print('min_samples_split',min_samples_split)
+	print('max_depti' ,max_depth)
+	min_samples_leaf = np.unique(np.random.randint(1,20,num_min_samples_leaf))
+	print('min_samples_leaf',min_samples_leaf)
+	#min_impurity_decrease= list(np.unique(np.random.uniform(0,1,num_min_impurity_decrease)))
+	min_impurity_decrease=[0]
+	print('max_samples' ,max_samples)
+	
 	best_score=-sys.maxsize
-
-	
-
-
 	print('num_cv : ',j+1, '/ ' , num_cv)
+	REG=np.unique(np.random.uniform(700,1300,nnum_lasso))
+	num_lasso = len(REG)
+	print('range of lasso reg :', REG)
 	I = I_all[j]
-	
 	X_val = X[I[j*num_fold:(j+1)*num_fold]]
 	y_val = y[I[j*num_fold:(j+1)*num_fold]]
-
 	#cross validation statement
 	if j==0:
 		X_train,y_train = X[I[(j+1)*num_fold:]],y[I[(j+1)*num_fold:]]
@@ -80,7 +83,8 @@ for j in range(num_cv):
 	X_val = (X_val - m_train) / std_train
 	
 	best_ridge=-sys.maxsize
-	for ridge in [1,100,1000]:#,100,1000]:
+	RIDGE = np.random.uniform(20,100,10)
+	for ridge in RIDGE:
 		rr = Ridge(alpha=ridge)
 		rr.fit(X_train,y_train)
 		score_ridge = rr.score(X_val,y_val)
@@ -111,24 +115,18 @@ for j in range(num_cv):
 			best_lasso_score=lasso_score
 			best_lasso_reg=reg
 	
-		idx_no_zero = np.arange(num_feature)[alpha!=0]
 		residual = (y_train- np.dot(X_train,alpha))
-		val_target_forest =( y_val-np.dot(X_val,alpha))
-		print('idx_no_zero',idx_no_zero)
 
-		
-		train_target_forest = residual
-		
-		train_forest = X_train[:,idx_no_zero]
-		val_forest = X_val[:,idx_no_zero]
-		alpha_forest=alpha[idx_no_zero]
+	
 
-		num_idx_no_zero=len(idx_no_zero)
-		m_forest,std_forest  = np.mean(train_forest,0).reshape((1,num_idx_no_zero)),np.std(train_forest,0).reshape((1,num_idx_no_zero))
-		train_forest=(train_forest-m_forest)/std_forest
-		val_forest=(val_forest-m_forest)/std_forest
 
 		best_forest_score=-sys.maxsize
+		
+
+		train_target_forest=residual
+
+		weight = np.ones(X_train.shape[0])
+
 		for n_estimator in n_estimators:
 			print('\t\t n_estimator ',n_estimator, ' / ',n_estimators )
 			for max_feature in max_features:
@@ -143,33 +141,34 @@ for j in range(num_cv):
 								#print('\t\t      bootstrap ',boot, ' / ',bootstrap )
 								for min_impurity_decr in min_impurity_decrease:
 									#print('\t\t       min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decrease)
-									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=max_sample)
-									rf.fit(train_forest,train_target_forest)
-									score=rf.score(val_forest,val_target_forest)
+									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=max_sample,criterion='squared_error')
+									rf.fit(X_train,train_target_forest,sample_weight=weight)
+									score=rf.score(X_val,y_val)
 									if score>best_forest_score:
 										best_forest_score=score
 										best_rf = rf	
-										best_train_forest_acc=rf.score(train_forest,train_target_forest)
+										best_X_train_acc=rf.score(X_train,train_target_forest)
 
-									y_pred = y_pred_val+(rf.predict(val_forest))
-									u = ((val_target_forest-y_pred)**2).sum()
-									v = ((val_target_forest-val_target_forest.mean())**2).sum()
+									y_pred = y_pred_val+rf.predict(X_val)
+									u = ((y_val-y_pred)**2).sum()
+									v = ((y_val-y_val.mean())**2).sum()
 									score = 1-u/v
 
 									if score>best_score:
 										best_score=score
 										best_RERFs={'lasso_reg':reg,'tree_reg':rf.get_params(deep=True)}
-										y_pred = y_pred_train+rf.predict(train_forest)
+										y_pred = y_pred_train+rf.predict(X_train)
 										u = ((train_target_forest-y_pred)**2).sum()
 										v = ((train_target_forest-train_target_forest.mean())**2).sum()
 										best_RERFs_train_acc = 1-u/v
-										best_model = [alpha_forest,rf.get_params(deep=True),idx_no_zero,m_train,std_train,m_forest,std_forest,reg,rf]
+										best_model = [alpha,rf.get_params(deep=True),m_train,std_train,reg,rf]
+		
 
 		rf = RandomForestRegressor()
-		rf.fit(train_forest,train_target_forest)
-		default_val.append(rf.score(val_forest,val_target_forest))
-		defaut_train.append(rf.score(train_forest,train_target_forest))
-	alpha,param,idx_no_zero,m_train,std_train,m_forest,std_forest,reg,rf=best_model
+		rf.fit(X_train,train_target_forest)
+		default_val.append(rf.score(X_val,y_val))
+		defaut_train.append(rf.score(X_train,train_target_forest))
+	alpha,param,m_train,std_train,reg,rf=best_model
 	rfs.append(best_model)
 	val_acc.append(best_score)
 	train_acc.append(best_RERFs_train_acc)
@@ -182,11 +181,11 @@ for j in range(num_cv):
 	out_max_depth.append(param['max_depth'])
 	out_min_impurity_decrease.append(param['min_impurity_decrease'])
 	out_lambda.append(reg)
-	y_pred = np.dot(X_val[:,idx_no_zero],alpha)+rf.predict((X_val[:,idx_no_zero]-m_forest)/std_forest)
+	y_pred = np.dot(X_val,alpha)+rf.predict(X_val)
 	u=((y_val-y_pred)**2).sum()
 	v = ((y_val-y_val.mean())**2).sum()
 	out_val_RERFs.append(1-u/v)
-	y_pred = np.dot(X_train[:,idx_no_zero],alpha)+rf.predict((X_train[:,idx_no_zero]-m_forest)/std_forest)
+	y_pred = np.dot(X_train,alpha)+rf.predict(X_train)
 	u=((y_train-y_pred)**2).sum()
 	v = ((y_train-y_train.mean())**2).sum()
 	out_train_RERFs.append(1-u/v)
@@ -247,6 +246,6 @@ print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
 idx = np.argmin(np.abs(out_val_RERFs-np.median(out_val_RERFs)))
 
-alpha,param,idx_no_zero,m_train,std_train,m_forest,std_forest,reg,_=rfs[idx]
-np.savez('parameters.npz',model_lasso=alpha,param_forest = param,idx_no_zero = idx_no_zero,m_lasso=m_train,std_lasso=std_train,m_forest=m_forest,std_forest=std_forest,reg_lasso=reg)
+alpha,param,m_train,std_train,reg,_=rfs[idx]
+#np.savez('parameters.npz',model_lasso=alpha,param_forest = param,m_lasso=m_train,std_lasso=std_train,reg_lasso=reg,reg_ridge = np.median(out_alpha_ridge))
 
