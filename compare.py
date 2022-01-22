@@ -3,12 +3,13 @@ import sys
 from lasso import lasso
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
+from sklearn.linear_model import Lasso
 import matplotlib.pyplot as plt
 data = np.load('regression_data1.npz')
 X,y = data['X'],data['y']
 num_data,num_feature = X.shape 
 parameters=np.load('parameters.npz',allow_pickle=True)
-alpha,param_forest,m_lasso,std_lasso,m_forest,std_forest,reg_lasso=parameters['model_lasso'],parameters['param_forest'],parameters['m_lasso'],parameters['std_lasso'],parameters['m_forest'],parameters['std_forest'],parameters['reg_lasso']
+la,param_forest,m_lasso,std_lasso,reg_lasso=parameters['model_lasso'],parameters['param_forest'],parameters['m_lasso'],parameters['std_lasso'],parameters['reg_lasso']
 reg_ridge = parameters['reg_ridge']
 alpha = np.zeros(num_feature)
 param_forest = param_forest.item()
@@ -37,18 +38,20 @@ for i in range(num):
 			X_train,y_train = np.concatenate((XA,XB)),np.concatenate((yA,yB))
 		nval = X_train.shape[0]
 
-		m_train,std_train  = np.mean(X_train,0).reshape((1,num_feature)),np.std(X_train,0).reshape((1,num_feature))
+		#m_train,std_train  = np.mean(X_train,0).reshape((1,num_feature)),np.std(X_train,0).reshape((1,num_feature))
 
 		num_train,num_val = X_train.shape[0],X_val.shape[0]
-		X_train = (X_train - m_train ) / std_train
+		#X_train = (X_train - m_train ) / std_train
 		
-		X_val = (X_val - m_train) / std_train
+		#X_val = (X_val - m_train) / std_train
 		v_val = ((y_val-y_val.mean())**2).sum()
 		v_train = ((y_train-y_train.mean())**2).sum()
 		
-		a,_,_,_ = lasso(X_train,y_train,alpha,reg_lasso)
-		val_pred_lasso = np.dot(X_val,a)
-		train_pred_lasso=np.dot(X_train,a)	
+		#a,_,_,_ = lasso(X_train,y_train,alpha,reg_lasso)
+		la = Lasso(alpha = reg_lasso)
+		la.fit(X_train,y_train)
+		val_pred_lasso = la.predict(X_val)#np.dot(X_val,a)
+		train_pred_lasso=la.predict(X_train)#np.dot(X_train,a)	
 
 		val_lasso.append(1-(((y_val-val_pred_lasso)**2).sum()/v_val))
 		train_lasso.append(1-(((y_train-train_pred_lasso)**2).sum()/v_train))

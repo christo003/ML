@@ -3,18 +3,18 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 import sys
 from lasso import lasso
-
+from sklearn.linear_model import Lasso
 data = np.load('test.npz')
 X , y =data['X'],data['y']
 num_data,num_feature=X.shape
 data = np.load('model.npz',allow_pickle=True)
-lasso = data['lasso'].item()
-a,m_lasso ,std_lasso = lasso['alpha'],lasso['m'],lasso['std']
-X=(X-m_lasso)/std_lasso
+la = data['lasso'].item()['lasso']
+#a,m_lasso ,std_lasso = lasso['alpha'],lasso['m'],lasso['std']
+#X=(X-m_lasso)/std_lasso
 rf = data['random_forest'].item()['rf']
 ridge = data['ridge'].item()['ridge']
 print(rf.get_params(deep=True))
-y_pred = np.dot(X,a)+rf.predict(X)
+y_pred = la.predict(X)+rf.predict(X)
 acc_RERFs = 1-((y-y_pred)**2).sum()/((y-y.mean())**2).sum()
 print('accuracy RERFs : ' , acc_RERFs)
 
