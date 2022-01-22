@@ -7,13 +7,15 @@ Celle contribuant au modèle final sont expliqué dans les premières lignes de 
 Le fichier preprocess1.py prends les données de regression_data.csv crée un fichier regression_data1.npz dans lequel le train et le target sont bien distinct.
 Puis une figure contenant les histogrammes construit à partir des paires de chaque charactéristiques et y est généré et sauvegarder dans visu_feature.png
 
-Le fichier estimate_reg_RERFs.py estime les paramètres du modèle RERFs avec cross validation puis génère le fichier parameters.npz contenant les paramètre median des meilleures parmètre selectionner à chaque shuffle. (attention le run de ce prgramme peut être long il faut changer les paramètre num_lasso, num_cv , n_estimators, max_features, max_depth, etc 
+Le fichier estimate_reg_RERFs.py estime les paramètres du modèle RERFs avec cross validation puis génère le fichier parameters.npz contenant les paramètre median des meilleures parmètre selectionner à chaque shuffle. (attention le run de ce prgramme peut être long il faut changer les paramètre num_lasso, num_cv , num_n_estimators, num_max_features, num_max_depth, etc 
 
-Le fichier modèle.py prend les meilleures paramètres selectionnée et génère le fichier model.npz.
+Le ficher compare.py recupere le meilleure paramètres trouver avec estimate_reg_RERFs dans parameters.npz et fait une cross validation pour comparer Ridge regression avec RERFs il génère par la suite le fichier compare.png montrant accuracy de la validatoin à travers la cross validaton.
+
+Le fichier modèle.py prend les meilleures paramètres selectionnée auparavant (dans parameters.npz) et génère le fichier model.npz.
  
 Le fichier preprocess_test.py génère le fichier test.npz pour accéder plus facilement au données test et test_target.
 
-Le fichier test.py test le model trouver dans model.npz et le test sur les données de test.npz. 
+Le fichier test.py test le model trouver dans model.npz et le test sur les données de test.npz il génère également deux figure montrant la prediction et la vraies valeurs. 
 
 
 
