@@ -30,6 +30,8 @@ plt.legend()
 plt.savefig('pred_vs_true.png')
 plt.show()
 
+
+
 plt.figure()
 plt.plot(np.abs(y[idx]-y_pred[idx]),'r,',label='absolut error RERFs')
 plt.plot(np.abs(y[idx]-y_pred_ridge[idx]),'b,',label='absolut error ridge')
@@ -40,9 +42,23 @@ plt.show()
 plt.figure()
 data = np.load('regression_data1.npz')
 y_ = data['y']
+X_=data['X']
 idx_ = np.argsort(y_)
 plt.plot(4*np.arange(y_.shape[0]),y_[idx_],label='initial data')
 plt.plot(y[idx],label='true data')
 plt.legend()
 plt.savefig('initial_value_and_test_value.png')
+plt.show()
+
+idx_closest = [np.argmin(np.abs(y-yk)) for yk in y_]
+plt.figure()
+plt.plot(np.abs(y[idx_closest]-y_),label='error for closest')
+plt.legend()
+plt.savefig('error_closest.png')
+plt.show()
+noise = X[idx_closest]-X_
+plt.figure()
+for i in range(X.shape[1]):
+	plt.plot(nois[:,k],label=str(i))
+plt.legend()
 plt.show()
