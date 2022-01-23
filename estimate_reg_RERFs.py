@@ -13,17 +13,17 @@ num_data,num_feature=X.shape
 max_lambda = 100
 
 
-num_cv=5
-num_lasso =3#
+num_cv=4
+num_lasso =5#
 
 #print(uu)
 n_estimators=[100]
 max_features = ['sqrt']
-num_max_samples=3	
-num_max_depth=3
-num_sample_split=3
-num_min_samples_leaf=3
-num_min_impurity_decrease=3
+num_max_samples=1	
+num_max_depth=1
+num_sample_split=1
+num_min_samples_leaf=1
+num_min_impurity_decrease=2
 
 num_fold=int(num_data/num_cv)
 I_all=[np.arange(num_data) for i in range(num_cv)]
@@ -47,17 +47,19 @@ out_train_RERFs,out_val_RERFs=[],[]
 parameters=[]
 for j in range(num_cv):
 	
-	REG = np.sort(np.unique(np.random.randint(30,65,num_lasso)))
-	max_samples = list(np.unique(np.random.uniform(0,1,num_max_samples)))
-	#max_samples.append(0.9753593350420936)
-	max_depth=np.unique(np.random.randint(20,40,num_max_depth))
-	min_samples_split =np.unique(np.random.randint(10,15,num_sample_split))
+	REG = np.sort(np.unique(np.random.randint(30,50,num_lasso)))
+	max_samples = [0.9753593350420936]#list(np.unique(np.random.uniform(0,1,num_max_samples)))
+	max_samples.append(0.7710202201809223 )
+	max_samples.append( 0.890549975748915 )
+	max_depth=[19,29,20]#np.unique(np.random.randint(20,40,num_max_depth))
+	min_samples_split =[14,10,12]#,np.unique(np.random.randint(10,20,num_sample_split))
 	print('min_samples_split',min_samples_split)
 	print('max_depti' ,max_depth)
-	min_samples_leaf = np.unique(np.random.randint(10,16,num_min_samples_leaf))
+	min_samples_leaf = [7,13]#,np.unique(np.random.randint(10,16,num_min_samples_leaf))
 	print('min_samples_leaf',min_samples_leaf)
 	min_impurity_decrease= list(np.unique(np.random.uniform(0,1,num_min_impurity_decrease)))
 	min_impurity_decrease.append(0)
+	min_impurity_decrease.append(0.18593636801663715)
 	print('max_samples' ,max_samples)
 	
 	best_score=-sys.maxsize

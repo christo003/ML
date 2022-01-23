@@ -9,6 +9,7 @@ X , y =data['X'],data['y']
 num_data,num_feature=X.shape
 data = np.load('model.npz',allow_pickle=True)
 la = data['lasso'].item()['lasso']
+print(la.get_params())
 #a,m_lasso ,std_lasso = lasso['alpha'],lasso['m'],lasso['std']
 #X=(X-m_lasso)/std_lasso
 rf = data['random_forest'].item()['rf']
