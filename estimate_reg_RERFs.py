@@ -10,20 +10,22 @@ from sklearn.linear_model import Lasso
 data=np.load('regression_data1.npz')
 y,X= data['y'],data['X']
 num_data,num_feature=X.shape
-max_lambda = 100
+max_reg = 100
+logscale =lambda k: np.exp(np.log(1/(10*max_reg))+k*(np.log(max_reg)-np.log(1/(10*max_reg)))/(max_reg-1))
 
+num_cv=3
+num_lasso =10#
+num_ridge=10
 
-num_cv=4
-num_lasso =5#
 
 #print(uu)
 n_estimators=[100]
 max_features = ['sqrt']
-num_max_samples=1	
-num_max_depth=1
-num_sample_split=1
-num_min_samples_leaf=1
-num_min_impurity_decrease=2
+num_max_samples=3	
+num_max_depth=3
+num_sample_split=3
+num_min_samples_leaf=3
+num_min_impurity_decrease=3
 
 num_fold=int(num_data/num_cv)
 I_all=[np.arange(num_data) for i in range(num_cv)]
@@ -32,7 +34,9 @@ for i in range(num_cv):
 
 
 out_n_estimators,out_max_features,out_max_depth,out_max_depth,out_min_samples_split,out_min_samples_leaf,out_max_samples, out_min_impurity_decrease = [],[],[],[],[],[],[],[]
+out_lasso_best_reg=[]
 
+out_val_ridge,out_val_lasso=[],[]
 
 
 
@@ -47,13 +51,13 @@ out_train_RERFs,out_val_RERFs=[],[]
 parameters=[]
 for j in range(num_cv):
 	
-	REG = np.sort(np.unique(np.random.randint(30,50,num_lasso)))
-	max_samples = np.unique(np.random.uniform(0.85,1,num_max_samples)))
-	max_depth=[19,29,20]#np.unique(np.random.randint(20,40,num_max_depth))
-	min_samples_split =[14,10,12]#,np.unique(np.random.randint(10,20,num_sample_split))
+	max_samples = list(np.unique(np.random.uniform(0.8,1,num_max_samples)))
+	max_samples.append(1)
+	max_depth=np.unique(np.random.randint(17,40,num_max_depth))
+	min_samples_split =np.unique(np.random.randint(10,20,num_sample_split))
 	print('min_samples_split',min_samples_split)
 	print('max_depti' ,max_depth)
-	min_samples_leaf = [7,13]#,np.unique(np.random.randint(10,16,num_min_samples_leaf))
+	min_samples_leaf = np.unique(np.random.randint(5,16,num_min_samples_leaf))
 	print('min_samples_leaf',min_samples_leaf)
 	min_impurity_decrease= list(np.unique(np.random.uniform(0,0.2,num_min_impurity_decrease)))
 	min_impurity_decrease.append(0)
@@ -61,9 +65,7 @@ for j in range(num_cv):
 	
 	best_score=-sys.maxsize
 	print('num_cv : ',j+1, '/ ' , num_cv)
-	#REG=np.unique(np.random.uniform(0,num_feature/3,nnum_lasso))
-	#num_lasso = len(REG)
-	print('range of lasso reg :', REG)
+	
 	I = I_all[j]
 	X_val = X[I[j*num_fold:(j+1)*num_fold]]
 	y_val = y[I[j*num_fold:(j+1)*num_fold]]
@@ -85,8 +87,10 @@ for j in range(num_cv):
 	#X_val = (X_val - m_train) / std_train
 	
 	best_ridge=-sys.maxsize
-	RIDGE = np.random.uniform(20,100,10)
+	RIDGE = [logscale(k) for k in  np.unique(np.random.randint(0,max_reg,num_ridge))]
+	print('range ridge reg :',RIDGE)
 	for ridge in RIDGE:
+		
 		rr = Ridge(alpha=ridge)
 		rr.fit(X_train,y_train)
 		score_ridge = rr.score(X_val,y_val)
@@ -102,19 +106,17 @@ for j in range(num_cv):
 	
 	alpha = np.zeros(num_feature)
 	best_lasso_score=-sys.maxsize
-	
-	for k in  range(len(REG)) :
+
+	LASSO = [logscale(k) for k in  np.unique(np.random.randint(0,max_reg,num_lasso))]
+	print('range of lasso reg :', LASSO)
+	k=0
+	for reg in  LASSO :
 		print('\t num_lasso : ',k+1, ' / ', num_lasso)
-		reg = np.exp(np.log(1/(10*max_lambda))+REG[k]*(np.log(max_lambda)-np.log(1/(10*max_lambda)))/(max_lambda-1))
+		k=k+1
+		
 		print('\t\treg',reg)
 		#reg = REG[k]
-		#alpha,_,_,_ = lasso(X_train,y_train,np.zeros(num_feature),reg)
-		#y_pred_val = np.dot(X_val,alpha)
-		#y_pred_train = np.dot(X_train,alpha)
 
-		#u = ((y_val-y_pred_val)**2).sum()
-		#v = ((y_val-y_val.mean())**2).sum()
-		#lasso_score=1-u/v
 
 		la = Lasso(alpha = reg)
 		la.fit(X_train,y_train)
@@ -173,7 +175,7 @@ for j in range(num_cv):
 										u = ((train_target_forest-y_pred)**2).sum()
 										v = ((train_target_forest-train_target_forest.mean())**2).sum()
 										best_RERFs_train_acc = 1-u/v
-										best_model = [la,rf.get_params(deep=True),m_train,std_train,reg,rf]
+										best_model = [la,rf]
 		
 
 		rf = RandomForestRegressor()
@@ -181,7 +183,12 @@ for j in range(num_cv):
 		default_val.append(rf.score(X_val,y_val))
 		defaut_train.append(rf.score(X_train,train_target_forest))
 	print('\t best reg lasso on validatoin ', best_lasso_reg)
-	la,param,m_train,std_train,reg,rf=best_model
+	out_val_lasso.append(lasso_score)
+	out_lasso_best_reg.append(best_lasso_reg)
+	la,rf=best_model
+	param=rf.get_params(deep=True)
+	best_model[0]=param
+	best_model[1]=la.get_params()['alpha']
 	rfs.append(best_model)
 	val_acc.append(best_score)
 	train_acc.append(best_RERFs_train_acc)
@@ -193,7 +200,7 @@ for j in range(num_cv):
 	out_max_samples.append(param['max_samples'])
 	out_max_depth.append(param['max_depth'])
 	out_min_impurity_decrease.append(param['min_impurity_decrease'])
-	out_lambda.append(reg)
+	out_lambda.append(best_model[1])
 	y_pred = la.predict(X_val)+rf.predict(X_val)
 	u=((y_val-y_pred)**2).sum()
 	v = ((y_val-y_val.mean())**2).sum()
@@ -225,10 +232,10 @@ print('out_max_deapth',out_max_depth)
 
 
 print()
-print('reg ridge',np.median(out_alpha_ridge))
+print('reg ridge',np.min(out_alpha_ridge))
 
 print()
-print('lambda',np.median(out_lambda))
+print('lambda',out_lambda[np.argmin(out_val_RERFs)])
 print()
 auto,log2,sqrt=0,0,0
 for i in out_max_features:
@@ -250,20 +257,18 @@ print()
 
 
 
-print('train accu tree default' ,np.median(defaut_train))
-print('train_acc tree optimize',np.median(train_acc))
+#print('train_acc tree optimize',np.median(train_acc))
 print('train_acc ridige optimizei',np.median(out_ridge_train))
 print('train acc RERFs',out_train_RERFs)
 
 
 #print('defaut val accu tree default'  ,np.median(default_val))
-print('val_acc tree optimize',np.median(val_acc))
-print('val_acc ridge optimize ' ,np.median(out_ridge_val))
-print('val acc RERFs', np.median(out_val_RERFs))
+#print('val_acc tree optimize',np.median(val_acc))
+print('val_acc ridge optimize ' ,np.max(out_ridge_val))
+print('val acc RERFs', np.max(out_val_RERFs))
 print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
-idx = np.argmin(np.abs(out_val_RERFs-np.median(out_val_RERFs)))
 
-la,param,m_train,std_train,reg,_=rfs[idx]
-np.savez('parameters.npz',model_lasso=la,param_forest = param,m_lasso=m_train,std_lasso=std_train,reg_lasso=reg,reg_ridge = np.median(out_alpha_ridge))
+rf,la=rfs[np.argmax(out_val_RERFs)]
+np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[np.argmax(out_val_lasso)],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[np.argmax(out_ridge_val)])
 

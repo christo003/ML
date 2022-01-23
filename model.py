@@ -9,15 +9,13 @@ data = np.load('regression_data1.npz')
 X,y = data['X'],data['y']
 num_data,num_feature_lasso = X.shape
 parameters=np.load('parameters.npz',allow_pickle=True)
-la,param_forest,m_lasso,std_lasso,reg_lasso=parameters['model_lasso'],parameters['param_forest'],parameters['m_lasso'],parameters['std_lasso'],parameters['reg_lasso']
+param_forest,param_lasso=parameters['RERFs_param_forest'],parameters['RERFs_param_lasso']
 reg_ridge = parameters['reg_ridge']
+reg_lasso = parameters['reg_lasso']
 param_forest = param_forest.item()
 #param_forest['criterion']='mse'#'squared_error'
-#m,std = np.mean(X,0).reshape((1,num_feature_lasso)),np.std(X,0).reshape((1,num_feature_lasso))
-#X=(X-m)/std
-la = Lasso(reg_lasso)
+la = Lasso(param_lasso)
 la.fit(X,y)
-#a,_,_,_=lasso(X,y,la.coef_,reg_lasso)
 
 rf = RandomForestRegressor(**param_forest)
 print(rf.get_params())
@@ -27,6 +25,12 @@ rf.fit(X,y_f,np.ones(num_data))
 ridge = Ridge(alpha=reg_ridge)
 ridge.fit(X,y)
 
-print('reg_lasso',reg_lasso)
-print('reg_ridge',reg_ridge)
-np.savez('model.npz',lasso={'lasso':la},random_forest={'rf':rf},ridge={'ridge':ridge} )
+
+
+baseline_lasso=Lasso(alpha=reg_lasso)
+baseline_lasso.fit(X,y)
+print('RERFs_param_lasso',param_lasso)
+print('RERFs_param_forest',param_forest)
+print('baseline reg_lasso',reg_lasso)
+print('baseline reg_ridge',reg_ridge)
+np.savez('model.npz',lasso={'lasso':la},random_forest={'rf':rf},baseline_ridge={'ridge':ridge},baseline_lasso={'lasso':baseline_lasso })
