@@ -231,7 +231,7 @@ for i,ax_row in enumerate(ax_array):
 
 fig.suptitle('test : fonction feature (when other is set to zeros)')
 plt.legend()
-plt.savefig('test_affichage_fonction_test.png')
+plt.savefig('test_affichage_fonction.png')
 fig,ax_array = plt.subplots(rows,columns,squeeze=False)
 k=0
 for i,ax_row in enumerate(ax_array):
