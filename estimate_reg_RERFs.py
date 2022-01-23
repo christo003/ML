@@ -19,11 +19,11 @@ num_lasso =3#
 #print(uu)
 n_estimators=[100]
 max_features = ['sqrt']
-num_max_samples=2	
-num_max_depth=2
-num_sample_split=2
-num_min_samples_leaf=2
-num_min_impurity_decrease=2
+num_max_samples=3	
+num_max_depth=3
+num_sample_split=3
+num_min_samples_leaf=3
+num_min_impurity_decrease=3
 
 num_fold=int(num_data/num_cv)
 I_all=[np.arange(num_data) for i in range(num_cv)]
@@ -47,15 +47,16 @@ out_train_RERFs,out_val_RERFs=[],[]
 parameters=[]
 for j in range(num_cv):
 	
-	REG = np.sort(np.unique(np.random.randint(35,65,num_lasso)))
-	max_samples = list(np.unique(np.random.uniform(0.5,1,num_max_samples)))
-	max_depth=np.unique(np.random.randint(15,30,num_max_depth))
-	min_samples_split =np.unique(np.random.randint(12,15,num_sample_split))
+	REG = np.sort(np.unique(np.random.randint(30,65,num_lasso)))
+	max_samples = list(np.unique(np.random.uniform(0,1,num_max_samples)))
+	#max_samples.append(0.9753593350420936)
+	max_depth=np.unique(np.random.randint(20,40,num_max_depth))
+	min_samples_split =np.unique(np.random.randint(10,15,num_sample_split))
 	print('min_samples_split',min_samples_split)
 	print('max_depti' ,max_depth)
-	min_samples_leaf = np.unique(np.random.randint(12,20,num_min_samples_leaf))
+	min_samples_leaf = np.unique(np.random.randint(10,16,num_min_samples_leaf))
 	print('min_samples_leaf',min_samples_leaf)
-	min_impurity_decrease= []#list(np.unique(np.random.uniform(0.5,0.8,num_min_impurity_decrease)))
+	min_impurity_decrease= list(np.unique(np.random.uniform(0,1,num_min_impurity_decrease)))
 	min_impurity_decrease.append(0)
 	print('max_samples' ,max_samples)
 	
@@ -153,7 +154,7 @@ for j in range(num_cv):
 								#print('\t\t      bootstrap ',boot, ' / ',bootstrap )
 								for min_impurity_decr in min_impurity_decrease:
 									#print('\t\t       min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decrease)
-									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=max_sample,criterion='squared_error')
+									rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=max_sample,criterion='squared_error',min_impurity_decrease=min_impurity_decr)
 									rf.fit(X_train,train_target_forest,sample_weight=weight)
 									score=rf.score(X_val,y_val)
 									if score>best_forest_score:

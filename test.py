@@ -16,28 +16,13 @@ ridge = data['ridge'].item()['ridge']
 print(rf.get_params(deep=True))
 y_pred = la.predict(X)+rf.predict(X)
 acc_RERFs = 1-((y-y_pred)**2).sum()/((y-y.mean())**2).sum()
-print('accuracy RERFs : ' , acc_RERFs)
+
 
 y_pred_ridge = ridge.predict(X)
 acc_ridge = 1-((y-y_pred_ridge)**2).sum()/((y-y.mean())**2).sum()
-print('accuracy Ridge : ',acc_ridge)
-plt.figure()
+
+
 idx= np.argsort(y)
-plt.plot(y[idx],label='true_value')
-plt.plot(y_pred[idx],',',label='pred RERFs')
-plt.plot(y_pred_ridge[idx],',',label='pred ridge')
-plt.legend()
-plt.savefig('pred_vs_true.png')
-plt.show()
-
-
-
-plt.figure()
-plt.plot(np.abs(y[idx]-y_pred[idx]),'r,',label='absolut error RERFs')
-plt.plot(np.abs(y[idx]-y_pred_ridge[idx]),'b,',label='absolut error ridge')
-plt.legend()
-plt.savefig('error.png')
-plt.show()
 
 plt.figure()
 data = np.load('regression_data1.npz')
@@ -50,15 +35,45 @@ plt.legend()
 plt.savefig('initial_value_and_test_value.png')
 plt.show()
 
-idx_closest = [np.argmin(np.abs(y-yk)) for yk in y_]
+idx_closest = [np.argmin((y[idx]-yk)**2) for yk in np.sort(y_)]
+
+
+
+mse_RERFs=(1/num_data)*(y-y_pred)**2
+m_RERFs = np.median(mse_RERFs)
+mse_ridge =((y-y_pred_ridge)**2)/num_data
+m_ridge=np.median(mse_ridge)
 plt.figure()
-plt.plot(np.abs(y[idx_closest]-y_),label='error for closest')
+plt.plot(mse_RERFs[idx],'r,',label='mse RERFs')
+plt.plot(mse_ridge[idx],'b,',label='mse ridge')
+plt.plot([0,num_data],[m_RERFs,m_RERFs],label='mean mse RERfs'+str(np.round(m_RERFs,3)))
+plt.plot([0,num_data],[m_ridge,m_ridge],label='mean mse ridge'+str(np.round(m_ridge,3)))
 plt.legend()
-plt.savefig('error_closest.png')
+plt.savefig('error.png')
 plt.show()
-noise = X[idx_closest]-X_
+
+print('accuracy RERFs : ' , acc_RERFs)
 plt.figure()
-for i in range(X.shape[1]):
-	plt.plot(nois[:,k],label=str(i))
-plt.legend()
+plt.title('accuracy RERFs: '+str(np.round(acc_RERFs,3)))
+idx_RERFs=np.arange(num_data)[mse_RERFs[idx]<m_RERFs]
+plt.plot(y[idx],label='true_value')
+plt.plot(y_pred[idx],',',label='pred RERFs')
+#plt.plot(idx_closest,y_pred[idx[idx_closest]],'k,',label='closest to train target') 
+plt.plot(idx_RERFs,y_pred[idx[idx_RERFs]],',',label='better than median')
+plt.plot(idx_closest,y[idx[idx_closest]],'k,',label='point closest to train target')
+plt.savefig('pred_RERFsvs_true.png')
 plt.show()
+
+print('accuracy Ridge : ',acc_ridge)
+plt.figure()
+plt.title('accuracy ridge: '+str(np.round(acc_ridge,3)))
+idx_ridge=np.arange(num_data)[mse_ridge[idx]<m_ridge]
+plt.plot(y[idx],label='true_value')
+plt.plot(y_pred_ridge[idx],',',label='pred ridge')
+plt.plot(idx_ridge,y_pred_ridge[idx[idx_ridge]],',',label='better than median')
+#plt.plot(idx_closest,y_pred_ridge[idx[idx_closest]],'k,',label='closest to train target') 
+plt.plot(idx_closest,y[idx[idx_closest]],'k,',label='point closest to train target' )
+plt.legend()
+plt.savefig('pred_ridge_vs_true.png')
+plt.show()
+
