@@ -174,7 +174,8 @@ plt.plot(e/np.max(e),'v',label='RERFs test opti lin')
 plt.grid()#axis='x')
 plt.xticks(np.linspace(0,49,50))
 plt.legend()
-plt.savefig('linear_feature_importance.png')
+plt.title('test lin. feature importance (when 1 the model say its important)')
+plt.savefig('test_linear_feature_importance.png')
 
 plt.figure()
 a,b,c,d,e=np.abs(la_.coef_),np.abs(ridge.coef_),np.abs(la.coef_),np.abs(la_RERFs_true.coef_),np.abs(la_true.coef_)
@@ -188,7 +189,9 @@ plt.semilogy(I,(e/np.max(e))[5:],'v',label='RERFs test opti lin')
 plt.grid(axis='x')
 plt.xticks(np.linspace(5,49,45))
 plt.legend()
-plt.savefig('linear_feature_importance2.png')
+plt.title('test lin. feature importance (semilogy scale of feature 5 to 50)')
+plt.savefig('test_linear_feature_importance2.png')
+
 
 
 plt.figure()
@@ -200,7 +203,8 @@ plt.semilogy(c/np.max(c),'v',label='RERFs test opti non lin')
 plt.xticks(np.linspace(0,49,50))
 plt.grid(axis='x')
 plt.legend()
-plt.savefig('non_linear_feature_importance.png')
+plt.title('test non lin. feature importance (when 1 the model say its important)')
+plt.savefig('test_non_linear_feature_importance.png')
 
 rows,columns=5,10
 fig,ax_array = plt.subplots(rows,columns,squeeze=False)
@@ -220,9 +224,14 @@ for i,ax_row in enumerate(ax_array):
                 axes.plot(I,yy,',',label='model opt test')
                 yy=rf_RERFs_true.predict(xx)+ la_RERFs_true.predict(xx)
                 axes.plot(I,yy,',',label='model test')
+                axes.get_xaxis().set_visible(False)
+                axes.get_yaxis().set_visible(False)
+
                 k=k+1
+
+fig.suptitle('test : fonction feature (when other is set to zeros)')
 plt.legend()
-plt.savefig('affichage_fonction_test.png')
+plt.savefig('test_affichage_fonction_test.png')
 fig,ax_array = plt.subplots(rows,columns,squeeze=False)
 k=0
 for i,ax_row in enumerate(ax_array):
@@ -232,14 +241,17 @@ for i,ax_row in enumerate(ax_array):
                 xx[:,k]=I
                 yy=rf.predict(xx)+ la.predict(xx)
                 axes.set_ylim(10**(-6),10**(-2))
-                axes.plot(((y[idx]-yy[idx])**2)/num_data,',',label='model train')
+                axes.semilogy(((y[idx]-yy[idx])**2)/num_data,',',label='model train')
                 yy=rf_true.predict(xx)+ la_true.predict(xx)
-                axes.plot(((y[idx]-yy[idx])**2)/num_data,',',label='model opt test')
+                axes.semilogy(((y[idx]-yy[idx])**2)/num_data,',',label='model opt test')
                 yy=rf_RERFs_true.predict(xx)+ la_RERFs_true.predict(xx)
                 axes.semilogy(((y[idx]-yy[idx])**2)/num_data,',',label='model test')
+                axes.get_xaxis().set_visible(False)
+                axes.get_yaxis().set_visible(False)
                 k=k+1
+fig.suptitle('test : error / feature')
 plt.legend()
-plt.savefig('error_par_feature_test.png')
+plt.savefig('test_error_par_feature.png')
 plt.show()
 
 
