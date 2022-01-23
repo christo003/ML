@@ -13,19 +13,51 @@ num_data,num_feature=X.shape
 max_reg = 100
 logscale =lambda k: np.exp(np.log(1/(10*max_reg))+k*(np.log(max_reg)-np.log(1/(10*max_reg)))/(max_reg-1))
 
-num_cv=3
-num_lasso =10#
+num_cv=5
+num_lasso =10
 num_ridge=10
 
 
 #print(uu)
 n_estimators=[100]
-max_features = ['sqrt']
-num_max_samples=3	
-num_max_depth=3
-num_sample_split=3
-num_min_samples_leaf=3
-num_min_impurity_decrease=3
+max_features = ['sqrt','log2']
+num_max_samples=1	
+num_max_depth=1
+num_sample_split=1
+num_min_samples_leaf=1
+num_min_impurity_decrease=1
+
+max_samples = list(np.unique(np.random.uniform(0.94,0.98,num_max_samples)))
+max_samples.append(np.random.uniform(0.85,0.88))
+max_samples.append(1)
+print('max_samples',max_samples)
+max_depth=list(np.unique(np.random.randint(3,14,num_max_depth)))
+max_depth.append(17)
+max_depth.append(29)
+max_depth=list(np.unique(max_depth))
+max_depth.append(None)
+print('max_depth : ',max_depth)
+min_samples_split =list(np.unique(np.random.randint(20,30,num_sample_split)))
+min_samples_split.append(17)
+min_samples_split.append(9)
+min_samples_split=np.unique(min_samples_split)
+print('min_samples_split',min_samples_split)
+min_samples_leaf = list(np.unique(np.random.randint(25,35,num_min_samples_leaf)))
+min_samples_leaf.append(15)
+min_samples_leaf.append(7)
+min_samples_leaf=np.unique(min_samples_leaf)
+print('min_samples_leaf',min_samples_leaf)
+min_impurity_decrease= list(np.unique(np.random.uniform(0.12,0.18,1)))
+min_impurity_decrease.append(np.random.uniform(0.2,0.3,))
+min_impurity_decrease.append(np.random.uniform(0.05,0.1))
+min_impurity_decrease.append(0)
+print('min_impurity_decrease',min_impurity_decrease)
+
+RIDGE = [logscale(k) for k in  (90/(num_ridge)*(np.arange(0,num_ridge))).astype(int)+np.sort(np.random.randint(0,10,num_ridge))]
+print('range ridge reg :',RIDGE)
+
+LASSO = [logscale(k) for k in  (90/(num_lasso)*(np.arange(0,num_lasso))).astype(int)+np.sort(np.random.randint(0,10,num_lasso))]#np.unique(np.linspace(25,35,num_lasso).astype(int))]
+print('range of lasso reg :', LASSO)
 
 num_fold=int(num_data/num_cv)
 I_all=[np.arange(num_data) for i in range(num_cv)]
@@ -51,17 +83,17 @@ out_train_RERFs,out_val_RERFs=[],[]
 parameters=[]
 for j in range(num_cv):
 	
-	max_samples = list(np.unique(np.random.uniform(0.8,1,num_max_samples)))
-	max_samples.append(1)
-	max_depth=np.unique(np.random.randint(17,40,num_max_depth))
-	min_samples_split =np.unique(np.random.randint(10,20,num_sample_split))
-	print('min_samples_split',min_samples_split)
-	print('max_depti' ,max_depth)
-	min_samples_leaf = np.unique(np.random.randint(5,16,num_min_samples_leaf))
-	print('min_samples_leaf',min_samples_leaf)
-	min_impurity_decrease= list(np.unique(np.random.uniform(0,0.2,num_min_impurity_decrease)))
-	min_impurity_decrease.append(0)
-	print('max_samples' ,max_samples)
+#	max_samples = list(np.unique(np.random.uniform(0.8,1,num_max_samples)))
+#	max_samples.append(1)
+#	max_depth=np.unique(np.random.randint(17,40,num_max_depth))
+#	min_samples_split =np.unique(np.random.randint(10,20,num_sample_split))
+#	print('min_samples_split',min_samples_split)
+#	print('max_depti' ,max_depth)
+#	min_samples_leaf = np.unique(np.random.randint(5,16,num_min_samples_leaf))
+#	print('min_samples_leaf',min_samples_leaf)
+#	min_impurity_decrease= list(np.unique(np.random.uniform(0,0.2,num_min_impurity_decrease)))
+#	min_impurity_decrease.append(0)
+#	print('max_samples' ,max_samples)
 	
 	best_score=-sys.maxsize
 	print('num_cv : ',j+1, '/ ' , num_cv)
@@ -87,8 +119,7 @@ for j in range(num_cv):
 	#X_val = (X_val - m_train) / std_train
 	
 	best_ridge=-sys.maxsize
-	RIDGE = [logscale(k) for k in  np.unique(np.random.randint(0,max_reg,num_ridge))]
-	print('range ridge reg :',RIDGE)
+	
 	for ridge in RIDGE:
 		
 		rr = Ridge(alpha=ridge)
@@ -107,8 +138,7 @@ for j in range(num_cv):
 	alpha = np.zeros(num_feature)
 	best_lasso_score=-sys.maxsize
 
-	LASSO = [logscale(k) for k in  np.unique(np.random.randint(0,max_reg,num_lasso))]
-	print('range of lasso reg :', LASSO)
+
 	k=0
 	for reg in  LASSO :
 		print('\t num_lasso : ',k+1, ' / ', num_lasso)
@@ -231,11 +261,18 @@ print('out_min_impurity_decr',out_min_impurity_decrease)
 print('out_max_deapth',out_max_depth)
 
 
-print()
-print('reg ridge',np.min(out_alpha_ridge))
+
+idxi = np.argmin((out_val_RERFs-np.median(out_val_RERFs))**2)
+idxir=np.argmin((out_ridge_val-np.median(out_ridge_val))**2)
+idxil = np.argmin((out_val_lasso-np.median(out_val_lasso))**2)
 
 print()
-print('lambda',out_lambda[np.argmin(out_val_RERFs)])
+print('best reg lasso baseline' ,out_lasso_best_reg[idxil])
+print()
+print('reg ridge',out_alpha_ridge[idxir])
+
+print()
+print('lambda',out_lambda[idxi])
 print()
 auto,log2,sqrt=0,0,0
 for i in out_max_features:
@@ -252,7 +289,9 @@ if (auto<=sqrt)&(sqrt>=log2):
 	t=', max_features = sqrt'
 if (auto<=log2)&(sqrt<=log2):
 	t=', max_features = log2'
-print('n_estimator=',np.median(out_n_estimators),t,', max_depth = ',np.median(out_max_depth),', min_samples_split = ',np.median(out_min_samples_split),', min_samples_leaf = ',np.median(out_min_samples_leaf),', max_samples = ',np.median(out_max_samples),', min_impurity_decrease = ',np.median(out_min_impurity_decrease))
+
+
+print('n_estimator=',out_n_estimators[idxi],t,', max_depth = ',out_max_depth[idxi],', min_samples_split = ',out_min_samples_split[idxi],', min_samples_leaf = ',out_min_samples_leaf[idxi],', max_samples = ',out_max_samples[idxi],', min_impurity_decrease = ',out_min_impurity_decrease[idxi])
 print()
 
 
@@ -269,6 +308,6 @@ print('val acc RERFs', np.max(out_val_RERFs))
 print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
 
-rf,la=rfs[np.argmax(out_val_RERFs)]
-np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[np.argmax(out_val_lasso)],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[np.argmax(out_ridge_val)])
+rf,la=rfs[idxi]
+np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
 

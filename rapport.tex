@@ -12,7 +12,6 @@
 \begin{document}
 \maketitle
 \section{}%Ex1
-
 \begin{equation}
 \begin{aligned}
 \bar{e}^2 &= \|\sum_i (v_i-u_i)\phi_i\|_{L^2(\Omega)}^2\\
@@ -20,19 +19,35 @@
 &= \sum_i (v_i - u_i )^2 (\text{diag}(M))_i
 \end{aligned}
 \end{equation}
+\begin{figure}
+\includegraphics[scale=1]{visu_feature.png}
+\end{figure}
 
 \newpage
-
 \begin{figure}
+\includegraphics[scale=1]{cv_reg.png}
+\end{figure}
 
-\includegraphics[scale=0.3]{grad.eps}
-\includegraphics[scale=0.3]{error.eps}
-
-L’erreur correspond bien à l’erreur théorique. 
-Ce qui me semble étrange, car je n’ai pas pris en compte les conditions de bords lors de mon implémentation.
+\newpage
+\begin{figure}
+\includegraphics[scale=1]{compare.png}
 \end{figure}
 
 
+\newpage
+\begin{figure}
+\includegraphics[scale=0.5]{pred_RERFsvs_true.png}
+\includegraphics[scale=0.5]{pred_lasso_vs_true.png}
+\includegraphics[scale=0.5]{pred_ridge_vs_true.png}
+\end{figure}
 
+\newpage
+\begin{figure}
+\includegraphics[scale=0.5]{pred_RERFsvs_true.png}
+\includegraphics[scale=0.5]{pred_lasso_vs_true.png}
+\includegraphics[scale=0.5]{pred_ridge_vs_true.png}
+\end{figure}
+
+\
 \end{document}
 
