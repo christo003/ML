@@ -12,26 +12,26 @@ y,X= data['y'],data['X']
 num_data,num_feature=X.shape
 logscale =lambda k,m: np.exp(np.log(1/(10*m))+k*(np.log(m)-np.log(1/(10*m)))/(m-1))
 
-num_cv=5
-num_lasso,num_ridge =5 , 5
+num_cv=3
+num_lasso,num_ridge =1 , 1
 
-n_estimators=[50,100]
+n_estimators=[100]
 max_feature = 'sqrt'#['sqrt']#,'log2']
 num_max_samples=1	
 num_max_depth=1
 num_sample_split=1
 num_min_samples_leaf=1
 num_min_impurity_decrease=1
-num_ccp_alpha=5
+num_ccp_alpha=1
 
 max_samples = list(np.unique(np.random.uniform(0.8,0.9,num_max_samples)))
-max_samples.append(np.random.uniform(0.9,0.97)),max_samples.append(1)
+#max_samples.append(np.random.uniform(0.9,0.97)),max_samples.append(1)
 
 print('max_samples',max_samples)
 max_depth=list(np.unique(np.random.randint(26,30,num_max_depth)))
-max_depth.append(4),max_depth.append(8),max_depth.append(16)
-max_depth=list(np.unique(max_depth))
-max_depth.append(None)
+#max_depth.append(4),max_depth.append(8),max_depth.append(16)
+#max_depth=list(np.unique(max_depth))
+#max_depth.append(None)
 print('max_depth : ',max_depth)
 
 min_samples_split =list(np.unique(np.random.randint(7,12,num_sample_split)))
@@ -40,15 +40,15 @@ min_samples_split=np.unique(min_samples_split)
 print('min_samples_split',min_samples_split)
 
 min_samples_leaf = list(np.unique(np.random.randint(4,9,num_min_samples_leaf)))
-min_samples_leaf.append(25)
-min_samples_leaf=np.unique(min_samples_leaf)
+#min_samples_leaf.append(25)
+#min_samples_leaf=np.unique(min_samples_leaf)
 print('min_samples_leaf',min_samples_leaf)
 
 min_impurity_decrease= list(np.unique(np.random.uniform(0.05,0.1,num_min_impurity_decrease)))
-min_impurity_decrease.append(0.13),min_impurity_decrease.append(np.random.uniform(0.12,0.18)),min_impurity_decrease.append(0)
+#min_impurity_decrease.append(0.13),min_impurity_decrease.append(np.random.uniform(0.12,0.18)),min_impurity_decrease.append(0)
 print('min_impurity_decrease',min_impurity_decrease)
 
-if num_ccp_alphas>1:
+if num_ccp_alpha>1:
 	ccp_alphas = [logscale(k,num_ccp_alpha)/(4*(num_ccp_alpha)) for k in range(num_ccp_alpha)]
 else:
 	ccp_alphas = []
@@ -59,14 +59,14 @@ if num_ridge>1:
 	RIDGE = [logscale(k,100) for k in  np.unique(np.random.randint(42,52,num_ridge-1))]#(90/(num_ridge)*(np.arange(0,num_ridge))).astype(int)+np.sort(np.random.randint(0,10,num_ridge))]
 else : 
 	RIDGE=[]
-RIDGE.append(logscale(48))
+RIDGE.append(logscale(48,100))
 RIDGE=np.unique(RIDGE)
 print('range ridge reg :',RIDGE)
 if num_lasso>1:
-	LASSO = [logscale(k) for k in  np.unique(np.random.randint(42,52,num_lasso-1))]#(90/(num_lasso)*(np.arange(0,num_lasso))).astype(int)+np.sort(np.random.randint(0,10,num_lasso))]#np.unique(np.linspace(40,54,num_lasso).astype(int))]
+	LASSO = [logscale(k,100) for k in  np.unique(np.random.randint(42,52,num_lasso-1))]#(90/(num_lasso)*(np.arange(0,num_lasso))).astype(int)+np.sort(np.random.randint(0,10,num_lasso))]#np.unique(np.linspace(40,54,num_lasso).astype(int))]
 else:
 	LASSO=[]
-LASSO.append(logscale(47))
+LASSO.append(logscale(47,100))
 LASSO = np.unique(LASSO)
 print('range of lasso reg :', LASSO)
 
@@ -189,7 +189,7 @@ for j in range(num_cv):
 	la,rf=best_model
 	param=rf.get_params(deep=True)
 	param['max_samples']=param['max_samples']/num_train
-	best_model[0]=param,best_model[1]=la.get_params()['alpha']
+	best_model=param,la.get_params()['alpha']
 	rfs.append(best_model),	parameters.append(param),val_acc.append(best_score),train_acc.append(best_RERFs_train_acc)
 	print('\t best forest parameters on validation : \n',param,'\n')
 	
@@ -264,5 +264,5 @@ print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
 
 rf,la=rfs[idxi]
-np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
+#np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
 
