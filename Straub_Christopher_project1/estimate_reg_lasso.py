@@ -41,7 +41,7 @@ for j in range(num_cv):
 		elif k == num_folder:
 			X_train,y_train=X[I[0:(k-1)*num_val]],y[I[0:(k-1)*num_val]]
 		else: 
-			XA,yA,XB,yB = X[I[0:(k)*num_val]],y[I[0:(k)*num_val]],X[I[(k+1)*num_val:]],y[I[(k+1)*num_val:]]
+			XA,yA,XB,yB = X[I[0:(k-1)*num_val]],y[I[0:(k-1)*num_val]],X[I[(k+1)*num_val:]],y[I[(k+1)*num_val:]]
 			X_train,y_train = np.concatenate((XA,XB)),np.concatenate((yA,yB))
 
 		nval = X_train.shape[0]

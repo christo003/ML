@@ -20,16 +20,16 @@ acc_RERFs = 1-((y-y_pred)**2).sum()/((y-y.mean())**2).sum()
 print('\nRERFs accu : ' ,acc_RERFs)
 
 ridge = data['baseline_ridge'].item()['ridge']
-print('\nbaseline ridge parameters:\n  ',ridge.get_params(deep=True))
+print('baseline ridge parameters : ',ridge.get_params(deep=True))
 y_pred_ridge = ridge.predict(X)
 acc_ridge = ridge.score(X,y)
-print('\nbaseline ridge accu : ' ,acc_ridge)
+print('baseline ridge accu : ' ,acc_ridge)
 
 la_ = data['baseline_lasso'].item()['lasso']
-print('\nbaseline lasso parameters :\n ',la_.get_params(deep=True))
+print('baseline lasso parameters : ',la_.get_params(deep=True))
 y_pred_lasso=la_.predict(X)
 acc_lasso = la_.score(X,y)
-print('\nbaseline lasso accu : ' ,acc_lasso)
+print('baseline lasso accu : ' ,acc_lasso)
 
 idx= np.argsort(y)
 
@@ -64,7 +64,7 @@ plt.legend()
 plt.savefig('error.png')
 #plt.show()
 
-print('\n\naccuracy RERFs : ' , acc_RERFs)
+print('\naccuracy RERFs : ' , acc_RERFs)
 plt.figure()
 plt.title('accuracy RERFs: '+str(np.round(acc_RERFs,3)))
 idx_RERFs=np.arange(num_data)[mse_RERFs[idx]<m_RERFs]
@@ -76,7 +76,7 @@ plt.plot(idx_closest,y[idx[idx_closest]],'k,',label='point closest to train targ
 plt.savefig('pred_RERFsvs_true.png')
 #plt.show()
 
-print('\n\naccuracy Ridge (baseline): ',acc_ridge)
+print('\naccuracy Ridge (baseline): ',acc_ridge)
 plt.figure()
 plt.title('accuracy ridge (baseline): '+str(np.round(acc_ridge,3)))
 idx_ridge=np.arange(num_data)[mse_ridge[idx]<m_ridge]
@@ -89,7 +89,7 @@ plt.legend()
 plt.savefig('pred_ridge_vs_true.png')
 #plt.show()
 
-print('\n\naccuracy lasso (baseline) : ',acc_lasso)
+print('\naccuracy lasso (baseline) : ',acc_lasso)
 plt.figure()
 plt.title('accuracy lasso (baseline): '+str(np.round(acc_lasso,3)))
 idx_lasso=np.arange(num_data)[mse_lasso[idx]<m_lasso]
@@ -101,30 +101,24 @@ plt.plot(idx_closest,y[idx[idx_closest]],'k,',label='point closest to train targ
 plt.legend()
 plt.savefig('pred_lasso_vs_true.png')
 #plt.show()
-print('\n\nRERFs : linear coef find with lasso \n',np.arange(num_feature)[la.coef_!=0])
-print('\nRERFs: non linear coef find with lasso \n',np.arange(num_feature)[la.coef_==0])
-print('\nRERFs :feature importance linear \n',np.argsort(np.abs(np.abs(la.coef_)-np.max(np.abs(la.coef_)))))
-print('\nRERFs :feature importance non linear\n',np.argsort(np.abs(np.abs(rf.feature_importances_)-np.max(np.abs(rf.feature_importances_)))))
+print('\nRERFs : linear coef find with lasso \n',np.arange(num_feature)[la.coef_!=0])
+print('RERFs: non linear coef find with lasso \n',np.arange(num_feature)[la.coef_==0])
+print('RERFs :feature importance linear \n',np.argsort(np.abs(np.abs(la.coef_)-np.max(np.abs(la.coef_)))))
+print('RERFs :feature importance non linear\n',np.argsort(np.abs(np.abs(rf.feature_importances_)-np.max(np.abs(rf.feature_importances_)))))
 print('\nridge (baseline):feature importance linear \n',np.argsort(np.abs(np.abs(ridge.coef_)-np.max(np.abs(ridge.coef_)))))
 print('\nlasso(baseline) :feature importance linear ',np.argsort(np.abs(np.abs(la_.coef_)-np.max(np.abs(la_.coef_)))))
 print('\nlasso (baseline) : linear coef find with lasso \n',np.arange(num_feature)[la_.coef_!=0])
-print('\nlasso (baseline) : non linear coef find with lasso\n',np.arange(num_feature)[la_.coef_==0])
+print('lasso (baseline) : non linear coef find with lasso\n',np.arange(num_feature)[la_.coef_==0])
 
 la_RERFs_true = Lasso(**la.get_params(deep=True))
 la_RERFs_true.fit(X,y)
 
-forest_parameters = rf.get_params(deep=True)
-if forest_parameters['max_samples']!= None:
-	if (0<forest_parameters['max_samples'])&(forest_parameters['max_samples']<=1):
-		forest_parameters['max_samples']=int(forest_parameters['max_samples']*num_data)
-	elif 0<forest_parameters['max_samples']:
-		forest_parameters['max_samples']=int(forest_parameters['max_samples']*num_data/X_.shape[0])
-rf_RERFs_true = RandomForestRegressor(**forest_parameters)
+rf_RERFs_true = RandomForestRegressor(**rf.get_params(deep=True))
 rf_RERFs_true.fit(X,y-la_RERFs_true.predict(X))
 
 #data=np.load('my_model_train_on_test.npz',allow_pickle=True)
-#rf_RERFs_true=data['random_forest'].item()['random_forest']
-#la_RERFs_true=data['lasso'].item()['lasso']
+rf_RERFs_true=data['random_forest'].item()['random_forest']
+la_RERFs_true=data['lasso'].item()['lasso']
 
 #np.savez('my_model_train_on_test.npz',random_forest={'random_forest':rf_RERFs_true},lasso={'lasso':la_RERFs_true})
 
@@ -132,13 +126,14 @@ y_pred_RERFs_true = la_RERFs_true.predict(X)+rf_RERFs_true.predict(X)
 acc_test_RERFs = 1-((y-y_pred_RERFs_true)**2).sum()/((y-y.mean())**2).sum()
 
 
-print('\n\narruracy my model with test as train ',acc_test_RERFs)
+print('arruracy my model with test as train ',acc_test_RERFs)
 
 
 print('\nRERFs true : linear coef find with lasso \n',np.arange(num_feature)[la_RERFs_true.coef_!=0])
-print('\nRERFs true: non linear coef find with lasso\n',np.arange(num_feature)[la_RERFs_true.coef_==0])
-print('\nRERFs true:feature importance linear \n',np.argsort(np.abs(np.abs(la_RERFs_true.coef_)-np.max(np.abs(la_RERFs_true.coef_)))))
-print('\nRERFs true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_RERFs_true.feature_importances_)-np.max(np.abs(rf_RERFs_true.feature_importances_)))))
+print('RERFs true: non linear coef find with lasso\n',np.arange(num_feature)[la_RERFs_true.coef_==0])
+print('RERFs true:feature importance linear \n',np.argsort(np.abs(np.abs(la_RERFs_true.coef_)-np.max(np.abs(la_RERFs_true.coef_)))))
+print('RERFs true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_RERFs_true.feature_importances_)-np.max(np.abs(rf_RERFs_true.feature_importances_)))))
+print()
 
 
 la_true = Lasso(alpha=0.1)
@@ -147,8 +142,8 @@ rf_true = RandomForestRegressor()
 rf_true.fit(X,y-la_true.predict(X))
 
 #data=np.load('best_model_train_on_test.npz',allow_pickle=True)
-#rf_true=data['random_forest'].item()['random_forest']
-#la_true=data['lasso'].item()['lasso']
+rf_true=data['random_forest'].item()['random_forest']
+la_true=data['lasso'].item()['lasso']
 #np.savez('best_model_train_on_test.npz',random_forest={'random_forest':rf_true},lasso={'lasso':la_true})
 
 
@@ -156,16 +151,16 @@ y_pred_true = rf_true.predict(X)+la_true.predict(X)
 #y_pred_true = rf_true.predict(X)+y_lasso_true
 #y_pred_true = rf_true.predict(X)
 acc_true = 1-((y-y_pred_true)**2).sum()/((y-y.mean())**2).sum()
-print('\n\naccuracy standard model with test data as train',acc_true)
+print('accuracy standard model with test data as train',acc_true)
 
 #print('\ntrue : linear coef find with lasso \n',np.arange(num_feature)[a!=0])
-#print('\ntrue: non linear coef find with lasso\n',np.arange(num_feature)[a==0])
-#print('\ntrue:feature importance linear \n',np.argsort(np.abs(np.abs(a)-np.max(np.abs(a)))))
-print('\ntrue:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_true.feature_importances_)-np.max(np.abs(rf_true.feature_importances_)))))
+#print('true: non linear coef find with lasso\n',np.arange(num_feature)[a==0])
+#print('true:feature importance linear \n',np.argsort(np.abs(np.abs(a)-np.max(np.abs(a)))))
+print('true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_true.feature_importances_)-np.max(np.abs(rf_true.feature_importances_)))))
 print('\ntrue : linear coef find with lasso \n',np.arange(num_feature)[la_true.coef_!=0])
-print('\ntrue: non linear coef find with lasso\n',np.arange(num_feature)[la_true.coef_==0])
-print('\ntrue:feature importance linear \n',np.argsort(np.abs(np.abs(la_true.coef_)-np.max(np.abs(la_true.coef_)))))
-print('\ntrue:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_true.feature_importances_)-np.max(np.abs(rf_true.feature_importances_)))))
+print('true: non linear coef find with lasso\n',np.arange(num_feature)[la_true.coef_==0])
+print('true:feature importance linear \n',np.argsort(np.abs(np.abs(la_true.coef_)-np.max(np.abs(la_true.coef_)))))
+print('true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_true.feature_importances_)-np.max(np.abs(rf_true.feature_importances_)))))
 print()
 
 plt.figure()

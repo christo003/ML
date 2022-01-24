@@ -5,29 +5,16 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import Lasso
 import matplotlib.pyplot as plt
-
-
-
 data = np.load('regression_data1.npz')
 X,y = data['X'],data['y']
-
 num_data,num_feature = X.shape 
-num =10
-num_cv = 10
-num_fold=int(num_data/num_cv)
-
 parameters=np.load('parameters.npz',allow_pickle=True)
 reg_lasso,param_forest,baseline_reg_lasso=parameters['RERFs_param_lasso'],parameters['RERFs_param_forest'],parameters['reg_lasso']
 reg_ridge = parameters['reg_ridge']
 param_forest = param_forest.item()
-print('max samples ds les paramètre de la foret ',param_forest['max_samples'])
-if param_forest['max_samples']!=None:
-	if (0<param_forest['max_samples'])&(param_forest['max_samples']<=1):
-		param_forest['max_samples']=int(param_forest['max_samples']*(num_data-num_fold))
-	#else :  il faut espérer connaitre le nombre utiliser lors de la validation croisée
-		#param_forest['max_samples']=int(param_forest['max_samples']*(num_data-num_fold))
-	
-
+num =10
+num_cv = 10
+num_fold=int(num_data/num_cv)
 I=np.arange(num_data)
 
 out_val_ridge,out_val_RERFs,out_val_lasso,out_train_ridge,out_train_RERFs,out_train_lasso = [],[],[],[],[],[]
@@ -46,11 +33,12 @@ for i in range(num):
 		#cross validation statement
 		if j==0:
 			X_train,y_train = X[I[(j+1)*num_fold:]],y[I[(j+1)*num_fold:]]
-		elif j == num_cv:
+		elif j == num_fold:
 			X_train,y_train=X[I[0:(j-1)*num_fold]],y[I[0:(j-1)*num_fold]]
 		else:
-			XA,yA,XB,yB = X[I[0:(j)*num_fold]],y[I[0:(j)*num_fold]],X[I[(j+1)*num_fold:]],y[I[(j+1)*num_fold:]]
+			XA,yA,XB,yB = X[I[0:(j-1)*num_fold]],y[I[0:(j-1)*num_fold]],X[I[(j+1)*num_fold:]],y[I[(j+1)*num_fold:]]
 			X_train,y_train = np.concatenate((XA,XB)),np.concatenate((yA,yB))
+		nval = X_train.shape[0]
 
 
 		num_train,num_val = X_train.shape[0],X_val.shape[0]

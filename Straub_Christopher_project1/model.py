@@ -10,19 +10,16 @@ data = np.load('regression_data1.npz')
 X,y = data['X'],data['y']
 num_data,num_feature = X.shape
 parameters=np.load('parameters.npz',allow_pickle=True)
-param_forest,param_lasso=parameters['RERFs_param_forest'].item(),parameters['RERFs_param_lasso']
-
-if (0<param_forest['max_samples'])&(param_forest['max_samples']<=1):
-        param_forest['max_samples']=int(param_forest['max_samples']*num_data)
-
-
+param_forest,param_lasso=parameters['RERFs_param_forest'],parameters['RERFs_param_lasso']
 reg_ridge = parameters['reg_ridge']
 reg_lasso = parameters['reg_lasso']
+param_forest = param_forest.item()
 #param_forest['criterion']='mse'#'squared_error'
 la = Lasso(param_lasso)
 la.fit(X,y)
 
 rf = RandomForestRegressor(**param_forest)
+print(rf.get_params())
 y_f = y-la.predict(X)#np.dot(X,a)
 rf.fit(X,y_f,np.ones(num_data))
 
@@ -34,9 +31,9 @@ ridge.fit(X,y)
 baseline_lasso=Lasso(alpha=reg_lasso)
 baseline_lasso.fit(X,y)
 print('RERFs_param_lasso',param_lasso)
-print('\nRERFs_param_forest\n',param_forest)
-print('\nbaseline reg_lasso',reg_lasso)
-print('\nbaseline reg_ridge',reg_ridge)
+print('RERFs_param_forest',param_forest)
+print('baseline reg_lasso',reg_lasso)
+print('baseline reg_ridge',reg_ridge)
 np.savez('model.npz',lasso={'lasso':la},random_forest={'rf':rf},baseline_ridge={'ridge':ridge},baseline_lasso={'lasso':baseline_lasso })
 
 acc_train = 1- ((y-(la.predict(X)+rf.predict(X)))**2).sum()/((y-y.mean())**2).sum()
