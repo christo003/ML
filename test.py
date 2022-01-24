@@ -110,13 +110,13 @@ print('\nlasso(baseline) :feature importance linear ',np.argsort(np.abs(np.abs(l
 print('\nlasso (baseline) : linear coef find with lasso \n',np.arange(num_feature)[la_.coef_!=0])
 print('lasso (baseline) : non linear coef find with lasso\n',np.arange(num_feature)[la_.coef_==0])
 
-#la_RERFs_true = Lasso(**la.get_params(deep=True))
-#la_RERFs_true.fit(X,y)
+la_RERFs_true = Lasso(**la.get_params(deep=True))
+la_RERFs_true.fit(X,y)
 
-#rf_RERFs_true = RandomForestRegressor(**rf.get_params(deep=True))
-#rf_RERFs_true.fit(X,y-la_RERFs_true.predict(X))
+rf_RERFs_true = RandomForestRegressor(**rf.get_params(deep=True))
+rf_RERFs_true.fit(X,y-la_RERFs_true.predict(X))
 
-data=np.load('my_model_train_on_test.npz',allow_pickle=True)
+#data=np.load('my_model_train_on_test.npz',allow_pickle=True)
 rf_RERFs_true=data['random_forest'].item()['random_forest']
 la_RERFs_true=data['lasso'].item()['lasso']
 
@@ -136,12 +136,12 @@ print('RERFs true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_R
 print()
 
 
-#la_true = Lasso(alpha=0.1)
-#la_true.fit(X,y)
-#rf_true = RandomForestRegressor()
-#rf_true.fit(X,y-la_true.predict(X))
+la_true = Lasso(alpha=0.1)
+la_true.fit(X,y)
+rf_true = RandomForestRegressor()
+rf_true.fit(X,y-la_true.predict(X))
 
-data=np.load('best_model_train_on_test.npz',allow_pickle=True)
+#data=np.load('best_model_train_on_test.npz',allow_pickle=True)
 rf_true=data['random_forest'].item()['random_forest']
 la_true=data['lasso'].item()['lasso']
 #np.savez('best_model_train_on_test.npz',random_forest={'random_forest':rf_true},lasso={'lasso':la_true})
