@@ -71,7 +71,7 @@ for i,ax_row in enumerate(ax_array):
                 xx[idx,k]=I
                 yy=rf.predict(xx)+ la.predict(xx)
                 #axes.set_title(str(k))
-                axes.plot(((y[idx]-yy[idx])**2)/num_data,',')
+                axes.semilogy(((y[idx]-yy[idx])**2)/num_data,',')
                 axes.get_xaxis().set_visible(False)
                 axes.get_yaxis().set_visible(False)
                 k=k+1
