@@ -12,10 +12,9 @@ y,X= data['y'],data['X']
 num_data,num_feature=X.shape
 logscale =lambda k,m: np.exp(np.log(1/(10*m))+k*(np.log(m)-np.log(1/(10*m)))/(m-1))
 
-num_cv=6
-num_lasso,num_ridge =3 , 3
-55
-n_estimators=[50,100]
+num_cv=4
+num_lasso,num_ridge =4 , 4
+n_estimators=[100]
 max_features = ['sqrt','auto','log2']
 num_max_samples=3	
 num_max_depth=3
@@ -33,23 +32,21 @@ max_samples.append(1)
 print('\nmax_samples',max_samples)
 if num_max_depth>1:
 	max_depth=list(np.unique(np.random.randint(5,30,num_max_depth-1)))
-	max_depth=[26,36,46]
+	max_depth=[26,46]
 else :
 	max_depth = []
 max_depth.append(None)
 print('max_depth : ',max_depth)
 if num_sample_split>1:
-	min_samples_split =list(np.unique(np.random.randint(20,100,num_sample_split-1)))
-	min_samples_split =[7,14]
-	
+	min_samples_split =list(np.arange(4,4+(num_sample_split-1)**2,num_sample_split))
 else:
 	min_samples_split=[]
 min_samples_split.append(2)
 min_samples_split=np.unique(min_samples_split)
 print('min_samples_split',min_samples_split)
 if num_min_samples_leaf>1:
-	min_samples_leaf = list(np.unique(np.random.randint(5,100,num_min_samples_leaf-1)))
-	min_samples_leaf=[3,7]
+
+	min_samples_leaf =list(np.arange(3,3+(num_min_samples_leaf-1)**2,num_min_samples_leaf))
 else : 
 	min_samples_leaf =[]
 min_samples_leaf.append(1)
@@ -57,7 +54,6 @@ min_samples_leaf.append(1)
 print('min_samples_leaf',min_samples_leaf)
 if num_min_impurity_decrease>1:
 	min_impurity_decrease= [logscale(k,3*num_min_impurity_decrease)/(3*num_min_impurity_decrease) for k in range(num_min_impurity_decrease,2*num_min_impurity_decrease,1)]
-#min_impurity_decrease.append(0.13),min_impurity_decrease.append(np.random.uniform(0.12,0.18)),
 else : 
 	min_impurity_decrease=[]
 min_impurity_decrease.append(0)
@@ -160,18 +156,19 @@ for j in range(num_cv):
 		for n_estimator in n_estimators:
 			print('\t\t n_estimator ',n_estimator, ' / ',n_estimators )
 			for ccp_alpha in ccp_alphas:
+				print('\t\t  ccp_alpha',ccp_alpha, ' / ',ccp_alphas )
 				for max_feature in max_features:	
-					#print('\t\t  max_feature ',max_feature, ' / ',max_features )
+					print('\t\t   max_feature ',max_feature, ' / ',max_features )
 					for depth in max_depth:
-						#print('\t\t   depth ',depth, ' / ',max_depth )
+						print('\t\t    depth ',depth, ' / ',max_depth )
 						for min_sample_split in min_samples_split:
-							#print('\t\t    min_samples_split ',min_sample_split, ' / ',min_samples_split )
+							print('\t\t     min_samples_split ',min_sample_split, ' / ',min_samples_split )
 							for min_sample_leaf in min_samples_leaf:
-								#print('\t\t     min_sample_leaf ',min_sample_leaf, ' / ',min_samples_leaf )
+								print('\t\t      min_sample_leaf ',min_sample_leaf, ' / ',min_samples_leaf )
 								for max_sample in max_samples:
-									#print('\t\t      bootstrap ',boot, ' / ',bootstrap )
+									print('\t\t       max_samples ',max_sample, ' / ',max_samples )
 									for min_impurity_decr in min_impurity_decrease:
-										#print('\t\t       min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decrease)
+										print('\t\t        min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decr)
 										rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=int(num_train*max_sample),min_impurity_decrease=min_impurity_decr,ccp_alpha=ccp_alpha)
 										rf.fit(X_train,train_target_forest,sample_weight=weight)
 
