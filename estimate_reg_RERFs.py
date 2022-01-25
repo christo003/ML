@@ -33,12 +33,14 @@ max_samples.append(1)
 print('\nmax_samples',max_samples)
 if num_max_depth>1:
 	max_depth=list(np.unique(np.random.randint(5,30,num_max_depth-1)))
+	max_depth=[26,36,46]
 else :
 	max_depth = []
 max_depth.append(None)
 print('max_depth : ',max_depth)
 if num_sample_split>1:
 	min_samples_split =list(np.unique(np.random.randint(20,100,num_sample_split-1)))
+	min_samples_split =[7,14]
 	
 else:
 	min_samples_split=[]
@@ -47,6 +49,7 @@ min_samples_split=np.unique(min_samples_split)
 print('min_samples_split',min_samples_split)
 if num_min_samples_leaf>1:
 	min_samples_leaf = list(np.unique(np.random.randint(5,100,num_min_samples_leaf-1)))
+	min_samples_leaf=[3,7]
 else : 
 	min_samples_leaf =[]
 min_samples_leaf.append(1)
@@ -266,5 +269,5 @@ print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
 
 rf,la=rfs[idxi]
-#np.savez('parameters2.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
+#np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
 
