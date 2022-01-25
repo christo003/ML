@@ -19,7 +19,7 @@ if (0<param_forest['max_samples'])&(param_forest['max_samples']<=1):
 reg_ridge = parameters['reg_ridge']
 reg_lasso = parameters['reg_lasso']
 #param_forest['criterion']='mse'#'squared_error'
-la = Lasso(param_lasso)
+la = Lasso(alpha=param_lasso)
 la.fit(X,y)
 
 rf = RandomForestRegressor(**param_forest)
