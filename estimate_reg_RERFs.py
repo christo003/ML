@@ -13,11 +13,11 @@ num_data,num_feature=X.shape
 logscale =lambda k,m: np.exp(np.log(1/(10*m))+k*(np.log(m)-np.log(1/(10*m)))/(m-1))
 
 num_cv=4
-num_lasso,num_ridge =4 , 4
+num_lasso,num_ridge =3 , 4
 n_estimators=[100]
 max_features = ['auto']
 num_max_samples=1	
-num_max_depth=1
+num_max_depth=3
 num_sample_split=3
 num_min_samples_leaf=1
 num_min_impurity_decrease=3
@@ -29,7 +29,9 @@ else:
 	max_samples=[]
 max_samples.append(1)
 
-print('\nmax_samples',max_samples)
+print('\n_estimators',n_estimators)
+print('max_samples',max_samples)
+
 if num_max_depth>1:
 	max_depth =[int(l) for l in np.linspace(40,5,num_max_depth-1)]
 else :
@@ -77,7 +79,7 @@ if num_lasso>1:
 	LASSO = [logscale(k,1000) for k in  429+np.arange(num_lasso-1)-int((num_lasso-1)/2)]
 else:
 	LASSO=[]
-LASSO.append(.1)
+LASSO.append( 0.011111111111111112)
 LASSO = np.unique(LASSO)
 num_lasso=len(LASSO)
 print('range of lasso reg :', LASSO)
@@ -153,7 +155,7 @@ for j in range(num_cv):
 		train_target_forest=residual
 		weight = np.ones(X_train.shape[0])/num_train
 		for n_estimator in n_estimators:
-			#print('\t\t n_estimator ',n_estimator, ' / ',n_estimators )
+			print('\t\t n_estimator ',n_estimator, ' / ',n_estimators )
 			for ccp_alpha in ccp_alphas:
 				print('\t\t  ccp_alpha',ccp_alpha, ' / ',ccp_alphas )
 				for max_feature in max_features:	

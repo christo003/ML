@@ -142,7 +142,7 @@ print('\nRERFs true:feature importance linear \n',np.argsort(np.abs(np.abs(la_RE
 print('\nRERFs true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_RERFs_true.feature_importances_)-np.max(np.abs(rf_RERFs_true.feature_importances_)))))
 
 
-#la_true = Lasso(alpha=0.1)
+#la_true = Lasso(alpha= 0.011111111111111112)
 #la_true.fit(X,y)
 #rf_true = RandomForestRegressor()
 #rf_true.fit(X,y-la_true.predict(X))

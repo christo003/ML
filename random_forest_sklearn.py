@@ -15,6 +15,14 @@ num_val = int(num_data/num_folder)
 max_samples=np.random.uniform(0.3,0.4,num_folder)
 #fig,ax_array= plt.subplots(rows,columns,squeeze=False)
 fig = plt.figure()
+num_ccp_alpha=5
+if num_ccp_alpha>1:
+        ccp_alphas = [logscale(k,num_ccp_alpha)/num_ccp_alpha for k in range(num_ccp_alpha)]
+else:
+        ccp_alphas = []
+ccp_alphas.append(0)
+
+
 k,mse,out_bag,error_mse,error_bag = 0,sys.maxsize,sys.maxsize,[],[]
 for i in range(rows):
 	for j in range(columns):
