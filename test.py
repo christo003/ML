@@ -56,8 +56,8 @@ mse_lasso =((y-y_pred_lasso)**2)/num_data
 m_lasso=np.median(mse_lasso)
 plt.figure()
 #plt.ylim(10**(-3),10**(-2))
-plt.semilogy(mse_RERFs[idx],'r,',label='mse RERFs')
-plt.semilogy(mse_ridge[idx],'b,',label='mse ridge')
+plt.semilogy(np.sort(mse_RERFs),'r,',label='mse RERFs')
+plt.semilogy(np.sort(mse_ridge),'b,',label='mse ridge')
 plt.semilogy([0,num_data],[m_RERFs,m_RERFs],label='mean mse RERfs'+str(np.round(m_RERFs,3)))
 plt.semilogy([0,num_data],[m_ridge,m_ridge],label='mean mse ridge'+str(np.round(m_ridge,3)))
 plt.legend()
@@ -119,12 +119,13 @@ if forest_parameters['max_samples']!= None:
 		forest_parameters['max_samples']=int(forest_parameters['max_samples']*num_data)
 	elif 0<forest_parameters['max_samples']:
 		forest_parameters['max_samples']=int(forest_parameters['max_samples']*num_data/X_.shape[0])
-rf_RERFs_true = RandomForestRegressor(**forest_parameters)
-rf_RERFs_true.fit(X,y-la_RERFs_true.predict(X))
 
-#data=np.load('my_model_train_on_test.npz',allow_pickle=True)
-#rf_RERFs_true=data['random_forest'].item()['random_forest']
-#la_RERFs_true=data['lasso'].item()['lasso']
+#rf_RERFs_true = RandomForestRegressor(**forest_parameters)
+#rf_RERFs_true.fit(X,y-la_RERFs_true.predict(X))
+
+data=np.load('my_model_train_on_test.npz',allow_pickle=True)
+rf_RERFs_true=data['random_forest'].item()['random_forest']
+la_RERFs_true=data['lasso'].item()['lasso']
 
 #np.savez('my_model_train_on_test.npz',random_forest={'random_forest':rf_RERFs_true},lasso={'lasso':la_RERFs_true})
 
@@ -141,14 +142,14 @@ print('\nRERFs true:feature importance linear \n',np.argsort(np.abs(np.abs(la_RE
 print('\nRERFs true:feature importance non linear\n',np.argsort(np.abs(np.abs(rf_RERFs_true.feature_importances_)-np.max(np.abs(rf_RERFs_true.feature_importances_)))))
 
 
-la_true = Lasso(alpha=0.1)
-la_true.fit(X,y)
-rf_true = RandomForestRegressor()
-rf_true.fit(X,y-la_true.predict(X))
+#la_true = Lasso(alpha=0.1)
+#la_true.fit(X,y)
+#rf_true = RandomForestRegressor()
+#rf_true.fit(X,y-la_true.predict(X))
 
-#data=np.load('best_model_train_on_test.npz',allow_pickle=True)
-#rf_true=data['random_forest'].item()['random_forest']
-#la_true=data['lasso'].item()['lasso']
+data=np.load('best_model_train_on_test.npz',allow_pickle=True)
+rf_true=data['random_forest'].item()['random_forest']
+la_true=data['lasso'].item()['lasso']
 #np.savez('best_model_train_on_test.npz',random_forest={'random_forest':rf_true},lasso={'lasso':la_true})
 
 
