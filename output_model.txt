@@ -1,0 +1,8 @@
+RERFs_param_lasso 0.10304169949505874
+
+RERFs_param_forest
+ {'bootstrap': True, 'ccp_alpha': 0, 'criterion': 'squared_error', 'max_depth': 26, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 2000, 'min_impurity_decrease': 0, 'min_samples_leaf': 1, 'min_samples_split': 7, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False}
+
+baseline reg_lasso 0.10304169949505874
+
+baseline reg_ridge 0.3972987023509259

@@ -1,0 +1,17 @@
+max samples ds les paramètre de la foret  1.0
+num_cv :  1 /  10
+num_cv :  2 /  10
+num_cv :  3 /  10
+num_cv :  4 /  10
+num_cv :  5 /  10
+num_cv :  6 /  10
+num_cv :  7 /  10
+num_cv :  8 /  10
+num_cv :  9 /  10
+num_cv :  10 /  10
+mean ridg 0.42233018556279023
+mean RERF 0.5122736765294952
+median ridg 0.4210275948525672
+median RERFs 0.5115376171354628
+reg lasso 0.10304169949505874
+param_forest {'bootstrap': True, 'ccp_alpha': 0, 'criterion': 'squared_error', 'max_depth': 26, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 1800, 'min_impurity_decrease': 0, 'min_samples_leaf': 1, 'min_samples_split': 7, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False}

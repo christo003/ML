@@ -1,0 +1,106 @@
+RERFs lasso parameters : 
+ {'alpha': array(0.1030417), 'copy_X': True, 'fit_intercept': True, 'max_iter': 1000, 'normalize': 'deprecated', 'positive': False, 'precompute': False, 'random_state': None, 'selection': 'cyclic', 'tol': 0.0001, 'warm_start': False}
+
+RERFs forest parameters : 
+ {'bootstrap': True, 'ccp_alpha': 0, 'criterion': 'squared_error', 'max_depth': 26, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 2000, 'min_impurity_decrease': 0, 'min_samples_leaf': 1, 'min_samples_split': 7, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False}
+
+RERFs accu :  0.5428607495272942
+
+baseline ridge parameters:
+   {'alpha': array(0.3972987), 'copy_X': True, 'fit_intercept': True, 'max_iter': None, 'normalize': 'deprecated', 'positive': False, 'random_state': None, 'solver': 'auto', 'tol': 0.001}
+
+baseline ridge accu :  0.4313382436239678
+
+baseline lasso parameters :
+  {'alpha': array(0.1030417), 'copy_X': True, 'fit_intercept': True, 'max_iter': 1000, 'normalize': 'deprecated', 'positive': False, 'precompute': False, 'random_state': None, 'selection': 'cyclic', 'tol': 0.0001, 'warm_start': False}
+
+baseline lasso accu :  0.4395078960925546
+
+
+accuracy RERFs :  0.5428607495272942
+
+
+accuracy Ridge (baseline):  0.4313382436239678
+
+
+accuracy lasso (baseline) :  0.4395078960925546
+
+
+RERFs : linear coef find with lasso 
+ [ 0  1  2  3  4  6  7  8 13 14 16 17 19 20 21 23 24 25 28 29 30 31 32 33
+ 34 36 38 39 41 43 45 47 48 49]
+
+RERFs: non linear coef find with lasso 
+ [ 5  9 10 11 12 15 18 22 26 27 35 37 40 42 44 46]
+
+RERFs :feature importance linear 
+ [ 0  2  1  3  4 28 36 23 39 31 48 21 24 49 14 17  7 38 19 33 32  8  6 43
+ 13 30 29 25 47 45 34 41 20 16 46 44 18 42 40 37  9 11 35 22 12 10 27 26
+  5 15]
+
+RERFs :feature importance non linear
+ [42 48 49 46 47 43 44 45 40 41  0 38 33 14 10  6 17 19  9 37  5  4 29 31
+ 13 20 22 26 32 36 34 35  8 15  2 28 11 25 16 23  3 27  7 39 12 18 24 30
+  1 21]
+
+ridge (baseline):feature importance linear 
+ [ 0  2  1  3  4 28 23 36 39 31 48 49 21 19 14 24 38 17  7 33 32  8  6 43
+ 25 29 30 13 45 34 47 41 20 16 10  5 18 12 44 42 15  9 22 37 11 40 26 27
+ 35 46]
+
+lasso(baseline) :feature importance linear  [ 0  2  1  3  4 28 36 23 39 31 48 21 24 49 14 17  7 38 19 33 32  8  6 43
+ 13 30 29 25 47 45 34 41 20 16 46 44 18 42 40 37  9 11 35 22 12 10 27 26
+  5 15]
+
+lasso (baseline) : linear coef find with lasso 
+ [ 0  1  2  3  4  6  7  8 13 14 16 17 19 20 21 23 24 25 28 29 30 31 32 33
+ 34 36 38 39 41 43 45 47 48 49]
+
+lasso (baseline) : non linear coef find with lasso
+ [ 5  9 10 11 12 15 18 22 26 27 35 37 40 42 44 46]
+
+
+arruracy my model with test as train  0.8849176345071433
+
+RERFs true : linear coef find with lasso 
+ [ 0  1  2  3  4  7 11 14 16 20 22 26 28 32 35 36 42 44 47 48 49]
+
+RERFs true: non linear coef find with lasso
+ [ 5  6  8  9 10 12 13 15 17 18 19 21 23 24 25 27 29 30 31 33 34 37 38 39
+ 40 41 43 45 46]
+
+RERFs true:feature importance linear 
+ [ 0  1  2  3  4  7 26 20 35 42 47 48 44 32 11 28 14 49 36 16 22 18  5 46
+ 45  6 43  8 41 40 39 38 37  9 33 17 10 31 30 29 12 27 13 25 15 23 21 19
+ 34 24]
+
+RERFs true:feature importance non linear
+ [45 43 46 40 47 42 44 41 49 48 26 31 39 20 25 23 35  7 18 16  9 10 14 29
+  6 34  3 12  0 28 36 17 27 13 15 32  4  8 38 37 21 30 33 11  1 22 24  2
+ 19  5]
+
+
+accuracy standard model with test data as train 0.9504041959633039
+
+true:feature importance non linear
+ [42 45 40 43 47 46 44 49 41 48 39 26 10 23 35 20  4 12  8 21 31 11 34  0
+  1 29  7 15 37  3 32 16  6 36 30 13 14  9 38 18 28 25 22 17  2 33 27  5
+ 24 19]
+
+true : linear coef find with lasso 
+ [ 0  1  2  3  4  7 11 14 16 20 22 26 28 29 32 35 36 40 42 44 47 48 49]
+
+true: non linear coef find with lasso
+ [ 5  6  8  9 10 12 13 15 17 18 19 21 23 24 25 27 30 31 33 34 37 38 39 41
+ 43 45 46]
+
+true:feature importance linear 
+ [ 0  1  2  3  4  7 26 20 35 42 47 48 44 32 11 28 14 49 36 16 22 40 29 18
+ 37 38 39  8 43  6 45 46  5 41  9 33 17 10 31 30 12 27 13 25 15 23 21 19
+ 34 24]
+
+true:feature importance non linear
+ [42 45 40 43 47 46 44 49 41 48 39 26 10 23 35 20  4 12  8 21 31 11 34  0
+  1 29  7 15 37  3 32 16  6 36 30 13 14  9 38 18 28 25 22 17  2 33 27  5
+ 24 19]
+

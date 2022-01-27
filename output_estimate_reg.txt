@@ -1,0 +1,53 @@
+max_samples [0.9847876305854116, 0.9648635815536847, 0.9188444700763947, 1]
+max_depth :  [26, 46, None]
+min_samples_split [2 4 7]
+min_samples_leaf [3, 6, 1]
+min_impurity_decrease [0.015212369414588414, 0.03513641844631534, 0.08115552992360536, 0]
+ccp_alpha :  [0.015212369414588414, 0.03513641844631534, 0.08115552992360536, 0]
+range ridge reg : [0.06271211 0.1        0.15784626 0.3972987 ]
+range of lasso reg : [0.09976978 0.1        0.10139254 0.1030417 ]
+
+ridge acc :  0.3904919831476754  with reg :  0.3972987023509259
+Lasso acc :  0.40525799225876113  with reg :  0.10304169949505874
+RERFs acc :  0.5119562627489787  with reg :  0.09976977642363204 and :  {'bootstrap': True, 'ccp_alpha': 0, 'criterion': 'squared_error', 'max_depth': None, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 1.0, 'min_impurity_decrease': 0.03513641844631534, 'min_samples_leaf': 1, 'min_samples_split': 4, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False} 
+
+ridge acc :  0.4587947954079925  with reg :  0.3972987023509259
+Lasso acc :  0.4670327085493897  with reg :  0.10304169949505874
+RERFs acc :  0.548452552385131  with reg :  0.10304169949505874 and :  {'bootstrap': True, 'ccp_alpha': 0, 'criterion': 'squared_error', 'max_depth': 26, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 1.0, 'min_impurity_decrease': 0, 'min_samples_leaf': 1, 'min_samples_split': 7, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False} 
+
+ridge acc :  0.46419228271819557  with reg :  0.062712113827838
+Lasso acc :  0.46712482499507235  with reg :  0.09976977642363204
+RERFs acc :  0.5570390444883837  with reg :  0.09976977642363204 and :  {'bootstrap': True, 'ccp_alpha': 0.015212369414588414, 'criterion': 'squared_error', 'max_depth': None, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 0.9186666666666666, 'min_impurity_decrease': 0.03513641844631534, 'min_samples_leaf': 6, 'min_samples_split': 7, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False}
+
+ridge acc :  0.3838546509745512  with reg :  0.3972987023509259
+Lasso acc :  0.39348193243125174  with reg :  0.10304169949505874
+RERFs acc :  0.4922573641043174  with reg :  0.1 and :  {'bootstrap': True, 'ccp_alpha': 0, 'criterion': 'squared_error', 'max_depth': 46, 'max_features': 'auto', 'max_leaf_nodes': None, 'max_samples': 1.0, 'min_impurity_decrease': 0, 'min_samples_leaf': 1, 'min_samples_split': 4, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': True, 'random_state': None, 'verbose': 0, 'warm_start': False} 
+
+
+out_alpha_ridge [0.3972987023509259, 0.3972987023509259, 0.062712113827838, 0.3972987023509259]
+out_ridge_train [0.46555545059375225, 0.44403416505410453, 0.4428174569739136, 0.46701921855091866]
+out_lambda [0.09976977642363204, 0.10304169949505874, 0.09976977642363204, 0.1]
+
+out_n_estimators [100, 100, 100, 100]
+out_max_features ['auto', 'auto', 'auto', 'auto']
+out_min_samples_split [4, 7, 7, 4]
+out_min_samples_leaf [1, 1, 6, 1]
+out_max_samples [1.0, 1.0, 0.9186666666666666, 1.0]
+out_min_impurity_decr [0.03513641844631534, 0, 0.03513641844631534, 0]
+out_max_deapth [None, 26, None, 46]
+
+best reg lasso baseline 0.10304169949505874
+
+reg ridge 0.3972987023509259
+
+lambda 0.10304169949505874
+
+n_estimator= 100 , max_features = auto , max_depth =  26 , min_samples_split =  7 , min_samples_leaf =  1 , max_samples =  1.0 , min_impurity_decrease =  0 , out_ccp_alpha :  0
+
+train_acc ridige optimizei 0.4547948078239284
+train acc RERFs [0.918872110736557, 0.8990480949842286, 0.8130794676339319, 0.9271386948050078]
+val_acc ridge optimize  0.42464338927783396
+val acc RERFs 0.5302044075670549
+val acc RERFs [0.5119562627489787, 0.548452552385131, 0.5570390444883837, 0.4922573641043174]
+out_ridge_val [0.3904919831476754, 0.4587947954079925, 0.46419228271819557, 0.3838546509745512]
+

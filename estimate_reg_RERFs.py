@@ -15,11 +15,11 @@ logscale =lambda k,m: np.exp(np.log(1/(10*m))+k*(np.log(m)-np.log(1/(10*m)))/(m-
 num_cv=4
 num_lasso,num_ridge =4 , 4
 n_estimators=[100]
-max_features = ['sqrt','auto','log2']
-num_max_samples=3	
-num_max_depth=3
+max_features = ['auto']
+num_max_samples=1	
+num_max_depth=1
 num_sample_split=3
-num_min_samples_leaf=3
+num_min_samples_leaf=1
 num_min_impurity_decrease=3
 num_ccp_alpha=3
 
@@ -31,8 +31,7 @@ max_samples.append(1)
 
 print('\nmax_samples',max_samples)
 if num_max_depth>1:
-	max_depth=list(np.unique(np.random.randint(5,30,num_max_depth-1)))
-	max_depth=[26,46]
+	max_depth =[int(l) for l in np.linspace(40,5,num_max_depth-1)]
 else :
 	max_depth = []
 max_depth.append(None)
@@ -152,23 +151,23 @@ for j in range(num_cv):
 	
 		residual= y_train-la.predict(X_train)
 		train_target_forest=residual
-		weight = np.ones(X_train.shape[0])
+		weight = np.ones(X_train.shape[0])/num_train
 		for n_estimator in n_estimators:
-			print('\t\t n_estimator ',n_estimator, ' / ',n_estimators )
+			#print('\t\t n_estimator ',n_estimator, ' / ',n_estimators )
 			for ccp_alpha in ccp_alphas:
 				print('\t\t  ccp_alpha',ccp_alpha, ' / ',ccp_alphas )
 				for max_feature in max_features:	
-					print('\t\t   max_feature ',max_feature, ' / ',max_features )
+					#print('\t\t   max_feature ',max_feature, ' / ',max_features )
 					for depth in max_depth:
-						print('\t\t    depth ',depth, ' / ',max_depth )
+						#print('\t\t    depth ',depth, ' / ',max_depth )
 						for min_sample_split in min_samples_split:
-							print('\t\t     min_samples_split ',min_sample_split, ' / ',min_samples_split )
+							#print('\t\t     min_samples_split ',min_sample_split, ' / ',min_samples_split )
 							for min_sample_leaf in min_samples_leaf:
-								print('\t\t      min_sample_leaf ',min_sample_leaf, ' / ',min_samples_leaf )
+								#print('\t\t      min_sample_leaf ',min_sample_leaf, ' / ',min_samples_leaf )
 								for max_sample in max_samples:
-									print('\t\t       max_samples ',max_sample, ' / ',max_samples )
+									#print('\t\t       max_samples ',max_sample, ' / ',max_samples )
 									for min_impurity_decr in min_impurity_decrease:
-										print('\t\t        min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decr)
+										#print('\t\t        min_impurity_decr ',min_impurity_decrease, ' / ',min_impurity_decr)
 										rf = RandomForestRegressor(n_estimators=n_estimator,max_features=max_feature,max_depth=depth,min_samples_split=min_sample_split,min_samples_leaf=min_sample_leaf,bootstrap=True,oob_score=True,max_samples=int(num_train*max_sample),min_impurity_decrease=min_impurity_decr,ccp_alpha=ccp_alpha)
 										rf.fit(X_train,train_target_forest,sample_weight=weight)
 
@@ -266,5 +265,5 @@ print('val acc RERFs',out_val_RERFs)
 print('out_ridge_val',out_ridge_val)
 
 rf,la=rfs[idxi]
-#np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
+np.savez('parameters.npz',reg_lasso=out_lasso_best_reg[idxil],RERFs_param_forest = rf,RERFs_param_lasso=la,reg_ridge = out_alpha_ridge[idxir])
 
